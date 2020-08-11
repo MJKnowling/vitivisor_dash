@@ -1,0 +1,48 @@
+{
+  "FileDescription" : "This file contains cultivar properites for vine stages",
+  "VarietyName" : {
+    "Value" : "SHIRAZ",
+    "Units" : "NA",
+    "Description" : "Varierty of berry"
+  },
+  "VarietyID" : {
+    "Value" : "IB0007",
+    "Units" : "NA",
+    "Description" : "ID of berry"
+  },
+  "P1VV" : {
+    "Value" : 5.0,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "Thermal time to end vernilization"
+  },
+  "P2BB" : {
+    "Value" : 325.0,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "Thermal time to bud burst"
+  },
+  "P3FF" : {
+    "Value" : 140.0,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "Thermal time to first flower"
+  },
+  "P4HH" : {
+    "Value" : 1450.0,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "Thermal time from set to harvest"
+  },
+  "P5LF" : {
+    "Value" : 800.0,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "Thermal time from harvest to leaf fall"
+  },
+  "G1BN" : {
+    "Value" : 0.5,
+    "Units" : "NA",
+    "Description" : "Genetic coefficient used in number of berry shoots"
+  },
+  "PHINT" : {
+    "Value" : 42.0,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "Used to determine thermal time fraction for leaf growth"
+  }
+}
