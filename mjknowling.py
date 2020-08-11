@@ -1351,7 +1351,7 @@ def run_scen(irrig_scen):
     for scen in scens:
         scen_ws = os.path.join(scen)
         print("running {} model".format(scen_ws))
-        run_model(wd=scen_ws)
+        #run_model(wd=scen_ws)  # TODO: until R env ported...
         #ts_plot_helper(cwd=scen_ws, fname="state_ts_{}.pdf".format(scen))
     return scens
 
