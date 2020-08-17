@@ -95,7 +95,10 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True):
             q_irr_scen[scen_ws] = q
         elif which.lower() == "LAI".lower():
             lai_irr_scen[scen_ws] = df.loc[:, which]  # LAI series
-    ax.set_ylabel(which)
+    if which == "irrigation":
+        ax.set_ylabel(which + " (mm)")
+    else:
+        ax.set_ylabel(which)
     #plt.colorbar()
     plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
