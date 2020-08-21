@@ -1353,7 +1353,7 @@ def run_scen(irrig_scen):
         scens.append("irrig_" + irrig_scen)
     for scen in scens:
         scen_ws = os.path.join(scen)
-        print("running {} model".format(scen_ws))
+        #print("running {} model".format(scen_ws))
         #run_model(wd=scen_ws)  # TODO: until R env ported...
         #ts_plot_helper(cwd=scen_ws, fname="state_ts_{}.pdf".format(scen))
     return scens
@@ -1393,6 +1393,11 @@ def plot_scen(scens, plot):
         else:
             fig, ax = gross_margin(dolla_irr_scen, revenue, which="cost_contribs",
                 include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost)
+    elif plot == "underdev":
+        fig = plt.figure()
+        ax = plt.subplot(111)
+        ax.text(0.5, 0.5, "UNDER DEV #sadface", color="red", ha='center', va='center')
+        #plt.close()
 
     return fig, ax
 
