@@ -9,8 +9,20 @@ from datetime import timedelta
 import numpy as np
 import pandas as pd
 
-font = {'size': 8}
+font = {'size': 30}
 import matplotlib
+
+import matplotlib.pylab as pylab
+params = {'legend.fontsize': 'x-large',
+          'figure.figsize': (8, 6),
+         'axes.labelsize': 'xx-large',
+         'axes.titlesize':'xx-large',
+         'xtick.labelsize':'x-large',
+         'ytick.labelsize':'x-large',
+         'axes.labelpad': '10'}
+pylab.rcParams.update(params)
+figsize = (8,6)
+
 
 matplotlib.rc("font", **font)
 import matplotlib.pyplot as plt
@@ -41,7 +53,8 @@ states = ["LAI", "total_soil_water", "FFulindex", "BerryDw", "daily_thermal_time
           "cumul_thermal_time", "Berry_thermal_time", "Matdtt", "Cpool", "shoot_num",
           "berry_num_shoot", "berry_num_vine", "irrigation"]
 
-start_date = datetime.strptime("2019-01-01", '%Y-%m-%d')  # from frun_vinelogic
+start_date = datetime.strptime("1999-01-01", '%Y-%m-%d')  # from frun_vinelogic
+daily_time_steps = 900  # from frun_vinelogic
 
 pst_fname = "pest.pst"
 #obs_types = ["lai", "soil_water_stress"]  # TODO: combine obs into truth_obs_data = {type: [res, noise]}
@@ -80,26 +93,32 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True):
     #fig, ax = plt.subplots(len(vars_of_interest), sharex=True)
     if which == "lai":  # yuck!
         which = "LAI"
-    fig = plt.figure()
+    elif which == "fruit":
+        which = "FruitDw"
+    fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
     #for i, ax in enumerate(ax):
     for scen_ws in cwds:
         df = pd.read_csv(os.path.join(scen_ws, vines_out_fname),
                          index_col="DayOfYear")
-        df.loc[:, which].plot(ax=ax, alpha=0.7)
+        dates = pd.date_range(start_date, periods=daily_time_steps)
+        df.index = dates
+        df.loc[datetime.strftime(start_date + timedelta(365), '%Y-%m-%d'):, which].plot(ax=ax, alpha=1.0, lw=2)
         yl = ax.get_ylim()[1]
         if which == "irrigation":
             q, q_per_ha = mm_to_ML_irrig(df.loc[:, which].sum())  # sum in ML
-            ax.text(0, yl * 0.8, "$\Sigma$ Q_irr_{0} = {1:.2f} ML/ha ({2} mm)".format(scen_ws, q_per_ha, int(q_per_ha * 100)))
+            #ax.text(0, yl * 0.8, "$\Sigma$ Q_irr_{0} = {1:.2f} ML/ha ({2} mm)".format(scen_ws, q_per_ha, int(q_per_ha * 100)))
             q_irr_scen[scen_ws] = q
+            ax.set_ylabel(which.title() + "\n(mm)")
         elif which.lower() == "LAI".lower():
-            lai_irr_scen[scen_ws] = df.loc[:, which]  # LAI series
-    if which == "irrigation":
-        ax.set_ylabel(which + " (mm)")
-    else:
-        ax.set_ylabel(which)
+            lai_irr_scen[scen_ws] = df.loc[:, which]
+            ax.set_ylabel("Canopy Density\n(Leaf Area Index)")
+        elif which.lower() == "FruitDw":
+            lai_irr_scen[scen_ws] = df.loc[:, which]
+            ax.set_ylabel("Fruit Dry Weight\n(per vine; UNITS)")
     #plt.colorbar()
+    ax.set_xlabel("Date")
     plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
         plt.close()
@@ -126,7 +145,7 @@ def yield_revenue_compare(cwds, which, show_plot=True):
     yield_rev = yields.copy()
     yield_rev = {x: a * grape_price for (x, a) in yield_rev.items()}
     
-    fig = plt.figure()
+    fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     if which == "yield":
         keys = yields.keys()
@@ -166,7 +185,7 @@ def irrig_compare(q_irr_scen, percent_entitlement=0, show_plot=True):
     #plt.close()
 
     # cost
-    fig = plt.figure()
+    fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     dolla_irr_scen = q_irr_scen.copy()
     if percent_entitlement == 100:  # one end member
@@ -203,7 +222,7 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
     if isinstance(tip_cost, dict) and include_canopy_mgmt:
         cost = {key: cost[key] + tip_cost.get(key, 0) for key in cost}
     
-    fig = plt.figure()
+    fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     if which == "gross_margin":
         gross_margin = {key: revenue[key] - cost.get(key, 0) for key in revenue}
@@ -1371,17 +1390,19 @@ def plot_scen(scens, plot):
 
     if plot == "irrigationtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation")
-    if plot == "irrigationcost":
+    elif plot == "irrigationcost":
         q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         _, (fig, ax) = irrig_compare(q_irr_scen, percent_entitlement=percent_entitlement)
-    if plot == "harvestyield":
+    elif plot == "harvestyield":
         #q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         _, (fig, ax) = yield_revenue_compare(cwds=scens, which="yield")
-    if plot == "harvestrevenue":
+    elif plot == "harvestrevenue":
         _, (fig, ax) = yield_revenue_compare(cwds=scens, which="revenue")
-    if plot == "laitimeseries":
+    elif plot == "laitimeseries":
         q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="lai")
-    if plot == "costcontributions" or plot == "grossmargin":
+    elif plot == "fruittimeseries":
+        q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="fruit")
+    elif plot == "costcontributions" or plot == "grossmargin":
         q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         dolla_irr_scen, _ = irrig_compare(q_irr_scen, percent_entitlement=percent_entitlement, show_plot=False)
         revenue, _ = yield_revenue_compare(cwds=scens, which="revenue", show_plot=False)
@@ -1393,12 +1414,25 @@ def plot_scen(scens, plot):
         else:
             fig, ax = gross_margin(dolla_irr_scen, revenue, which="cost_contribs",
                 include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost)
+    elif "date" in plot:
+        fig, ax = plot_phenol_keydate(cwds=scens, which=plot)
     elif plot == "underdev":
-        fig = plt.figure()
+        fig = plt.figure(figsize=figsize)
         ax = plt.subplot(111)
-        ax.text(0.5, 0.5, "UNDER DEV #sadface", color="red", ha='center', va='center')
+        ax.text(0.5, 0.5, "UNDER CONSTRUCTION", color="red", ha='center', va='center', fontsize=24)
         #plt.close()
 
+    return fig, ax
+
+def plot_phenol_keydate(cwds, which):
+    fig = plt.figure(figsize=figsize)
+    ax = plt.subplot(111)
+    for scen_ws in cwds:
+        df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
+        if "bb" in which:
+            plot = "bud burst"
+            kd = df.loc[:, "DOY02"][0]
+        ax.text(0.5, 0.5, "{0} DATE ({1}):\n {2}".format(which.upper(), scen_ws, kd), ha='center', va='center', fontsize=24)
     return fig, ax
 
 
