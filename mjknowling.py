@@ -205,7 +205,7 @@ def yield_revenue_compare(cwds, which, show_plot=True):
             if "base" not in k.lower():
                 bl[i].set_color('#ff7f0e')
         ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
-        plt.ylabel("Harvest Yield (Tonnes)\nADD TONNE/HA TEXT ON BARCHART (~17)")
+        plt.ylabel("Harvest Yield (Tonnes)\nADD TONNE/HA (14-18) TEXT ON FIGURE")
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
