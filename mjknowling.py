@@ -88,7 +88,7 @@ def mm_to_ML_irrig(mm):
     total_ML = mm * 0.001 * irrig_area * 0.001
     return total_ML, total_ML / (irrig_area * 0.0001)
 
-def ts_compare_irrig_plot(cwds, which, show_plot=True):
+def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     if which == "lai":  # yuck!
         which = "LAI"
     elif which == "fruit":
@@ -96,9 +96,11 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True):
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
+    q_irr_per_ha_scen = {}
     #for i, ax in enumerate(ax):
     dfs = {}
-    if "base" not in cwds[0]:
+    yl = []
+    if cwds[0] == "base":
         cwds = cwds.reverse()
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_out_fname),
@@ -111,13 +113,14 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True):
         #print(which)
         df = df.loc[:, which]
         #print(df)
-        yl = ax.get_ylim()[1]
+        yl.append(ax.get_ylim()[1])
         xl = ax.get_xlim()[1]
         dfs[scen_ws] = df
         if "irrigation" in which:
             q, q_per_ha = mm_to_ML_irrig(df.sum())  # sum in ML
             #ax.text(xl * 0.5, yl * 0.8, "Total_{0} = {1:.2f} ML/ha ({2} mm)".format(scen_ws, q_per_ha, int(q_per_ha * 100)))
             q_irr_scen[scen_ws] = q
+            q_irr_per_ha_scen[scen_ws] = q_per_ha
             ax.set_ylabel(which.title() + "\n(mm)")
         else:
             if which.lower() == "LAI".lower():
@@ -155,9 +158,17 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True):
         #ax.xaxis.set_major_formatter(mticker.FixedFormatter(ticklabels))
         #ax.xaxis.set_minor_formatter(mticker.FixedFormatter(ticklabels))
     #else:
-    dfs.plot(ax=ax, alpha=1.0, lw=2)
-    ax.legend([x.split("_")[-1].title() for x in dfs.columns]);
-    ax.set_xlabel("Date")
+    if "irrigation" in which and total is True:
+        text_height, text_color = [0.9, 0.7], ["#1f77b4", "#ff7f0e"]
+        for i, scen_ws in enumerate(cwds):
+            ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.2f} ML/ha)"
+                .format(scen_ws.split("_")[-1].title(), q_irr_scen[scen_ws], q_irr_per_ha_scen[scen_ws]), 
+                ha='center', va='center', fontsize=24, color=text_color[i])
+            ax.axis('off')
+    else:
+        dfs.plot(ax=ax, alpha=1.0, lw=2)
+        ax.legend([x.split("_")[-1].title() for x in dfs.columns]);
+        ax.set_xlabel("Date")
     #plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
         plt.close()
@@ -298,27 +309,27 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
             c.append(key)
             v.append(val)
         v = np.array(v)
-        # TODO: generalize a bit here
-        print(c)
-        print("v")
-        print(v)
-        '''
-        keys = yield_rev.keys()
-        values = yield_rev.values()
-        bl = ax.bar(keys, values)
-        for i, k in enumerate(keys):
-            if "base" not in k.lower():
-                bl[i].set_color('#ff7f0e')
-        ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
-        '''
-        bl = ax.bar(range(len(c)), v[:, 0], label="irrigation")
+        b = ax.bar(range(len(c)), v[:, 0], label="irrigation", alpha=1.0)
         for i, k in enumerate(c):
             if "base" not in k.lower():
-                bl[i].set_color('#ff7f0e')
+                b[i].set_color('#ff7f0e')  # assume two scens only
+            else:
+                b[i].set_color('#1f77b4')
+        b = ax.bar(range(len(c)), v[:, 1], bottom=v[:, 0], label="spray", alpha=0.3)
+        for i, k in enumerate(c):
+            if "base" not in k.lower():
+                b[i].set_color('#ff7f0e')  # assume two scens only
+            else:
+                b[i].set_color('#1f77b4')
+        b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", alpha=0.6)
+        for i, k in enumerate(c):
+            if "base" not in k.lower():
+                b[i].set_color('#ff7f0e')  # assume two scens only
+            else:
+                b[i].set_color('#1f77b4')
         ax.legend()
-        b2 = ax.bar(range(len(c)), v[:, 1], bottom=v[:, 0], label="spray")
-        b3 = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip")
         plt.xticks(range(len(c)), c)
+        ax.set_xticklabels([x.split("_")[-1].title() for x in c])
         plt.ylabel("Cost Contributions ($)")
         plt.show()
         #plt.savefig(os.path.join("plots", "cost_contribs.pdf"))
@@ -1460,6 +1471,10 @@ def plot_scen(scens, plot):
 
     if plot == "irrigationtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation")
+    elif plot == "irrigationtotal":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", total=True)
+    elif plot == "irrigationtotal":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal")
     elif plot == "irrigationcost":
         q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         _, (fig, ax) = irrig_compare(q_irr_scen, percent_entitlement=percent_entitlement)
