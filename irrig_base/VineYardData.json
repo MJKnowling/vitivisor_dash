@@ -31,12 +31,12 @@
     "Description" : ""
   },
   "TRUNKDW" : {
-    "Value" : 8.0,
+    "Value" : 10.0,
     "Unit" : "cm",
     "Description" : ""
   },
   "TRUNKCHO" : {
-    "Value" : 100.0,
+    "Value" : 150.0,
     "Unit" : "cm",
     "Description" : ""
   },

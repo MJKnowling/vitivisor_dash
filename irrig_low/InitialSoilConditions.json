@@ -1,7 +1,7 @@
 {
   "FileDescription" : "This file contains initial conditions to be used in soil layer calculations",
   "InitialSoilWater" : {
-    "Value" : [0.1,0.1,0.1,0.07,0.07,0.07,0.07,0.1,0.1,0.1,0.1,0.1,0.15,0.2,0.2],
+    "Value" : [0.27,0.27,0.27,0.27,0.31,0.32,0.32,0.31,0.34,0.34,0.34,0.34,0.34,0.34,0.34],
     "Unit" : "unknown",
     "Description" : "Used to initalise the water in soil layers"
   }

@@ -16,12 +16,12 @@
     "Description" : "Baseline temperature for thermal time calculations"
   },
   "CritWFPS" : {
-    "Value" : 0.45,
+    "Value" : 0.65,
     "Units" : "",
     "Description" : "Critical limit for water filled pore space"
   },
   "MaxRootDepth" : {
-    "Value" : 200,
+    "Value" : 100,
     "Units" : "cm",
     "Description" : "Maximum root depth"
   },

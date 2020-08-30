@@ -9,7 +9,7 @@ for( i in jsons ) {
  writeLines(l2, con=i)
 }
 
-output<-vines(start_date="1999-01-01",input_file_dir=i_dir,sim_length=900)
+output<-vines(start_date="2019-01-01",input_file_dir=i_dir,sim_length=900)
 
 # state variable time series
 states<-output[[1]]

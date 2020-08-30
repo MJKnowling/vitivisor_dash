@@ -53,7 +53,7 @@ states = ["LAI", "total_soil_water", "FFulindex", "BerryDw", "daily_thermal_time
           "cumul_thermal_time", "Berry_thermal_time", "Matdtt", "Cpool", "shoot_num",
           "berry_num_shoot", "berry_num_vine", "irrigation"]
 
-start_date = datetime.strptime("1999-01-01", '%Y-%m-%d')  # from frun_vinelogic
+start_date = datetime.strptime("2019-01-01", '%Y-%m-%d')  # from frun_vinelogic
 daily_time_steps = 900  # from frun_vinelogic
 
 pst_fname = "pest.pst"
@@ -96,32 +96,32 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
-    q_irr_per_ha_scen = {}
+    q_irr_per_ha_scen, q_mm_total = {}, {}
     #for i, ax in enumerate(ax):
     dfs = {}
     yl = []
-    if cwds[0] == "base":
-        cwds = cwds.reverse()
+    if "base" in cwds[1]:
+        cwds.reverse()
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_out_fname),
                          index_col="DayOfYear")
         dates = pd.date_range(start_date, periods=daily_time_steps)
         df.index = dates
-        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 31), '%Y-%m-%d'):
-        datetime.strftime(start_date + timedelta(900 - 30), '%Y-%m-%d'), :]
-        #print(df)
-        #print(which)
+        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 61), '%Y-%m-%d'):
+        datetime.strftime(start_date + timedelta(900), '%Y-%m-%d'), :]
         df = df.loc[:, which]
-        #print(df)
         yl.append(ax.get_ylim()[1])
         xl = ax.get_xlim()[1]
         dfs[scen_ws] = df
         if "irrigation" in which:
-            q, q_per_ha = mm_to_ML_irrig(df.sum())  # sum in ML
+            q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
+            #print(df.loc[df.values>0.0])
+            #print(df.sum(), q_per_ha)
             #ax.text(xl * 0.5, yl * 0.8, "Total_{0} = {1:.2f} ML/ha ({2} mm)".format(scen_ws, q_per_ha, int(q_per_ha * 100)))
             q_irr_scen[scen_ws] = q
+            q_mm_total[scen_ws] = df.sum()
             q_irr_per_ha_scen[scen_ws] = q_per_ha
-            ax.set_ylabel(which.title() + "\n(mm)")
+            ax.set_ylabel(which.title() + "\n(mm/day)")
         else:
             if which.lower() == "LAI".lower():
                 lai_irr_scen[scen_ws] = df
@@ -131,11 +131,11 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
             elif which.lower() == "Brix".lower():
                 ax.set_ylabel("Brix\n(degrees)")
             elif which == "infiltration":
-                ax.set_ylabel("{} (mm/d)".format(which.title()))
+                ax.set_ylabel("{} (mm/day)".format(which.title()))
             elif which == "evap":
-                ax.set_ylabel("{}oration (mm/d)".format(which.title()))
+                ax.set_ylabel("{}oration (mm/day)".format(which.title()))
             elif which == "root_uptake":
-                ax.set_ylabel("{} (mm/d)".format(which.replace("_", " ").title()))
+                ax.set_ylabel("{} (mm/day)".format(which.replace("_", " ").title()))
             elif which == "soil_water":
                 ax.set_ylabel("Soil saturation (-)")
     dfs = pd.DataFrame(dfs)
@@ -161,8 +161,8 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     if "irrigation" in which and total is True:
         text_height, text_color = [0.9, 0.7], ["#1f77b4", "#ff7f0e"]
         for i, scen_ws in enumerate(cwds):
-            ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.2f} ML/ha)"
-                .format(scen_ws.split("_")[-1].title(), q_irr_scen[scen_ws], q_irr_per_ha_scen[scen_ws]), 
+            ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2} ML/ha)"
+                .format(scen_ws.split("_")[-1].title(), q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
                 ha='center', va='center', fontsize=24, color=text_color[i])
             ax.axis('off')
     else:
@@ -205,7 +205,7 @@ def yield_revenue_compare(cwds, which, show_plot=True):
             if "base" not in k.lower():
                 bl[i].set_color('#ff7f0e')
         ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
-        plt.ylabel("Harvest Yield (Tonnes)")
+        plt.ylabel("Harvest Yield (Tonnes)\nADD TONNE/HA TEXT ON BARCHART (~17)")
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
@@ -1494,7 +1494,7 @@ def plot_scen(scens, plot):
     elif plot == "evaporationts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="evap")
     elif plot == "soilmoisturets":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="vol_water_content")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water")
     elif plot == "rootuptakets":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="root_uptake")
     elif plot == "costcontributions" or plot == "grossmargin":
@@ -1523,6 +1523,8 @@ def plot_phenol_keydate(cwds, which):
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     text_height, text_color = [0.9, 0.7], ["#1f77b4", "#ff7f0e"]
+    if "base" in cwds[1]:
+        cwds.reverse()
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
         if "bb" in which:
@@ -1537,7 +1539,7 @@ def plot_phenol_keydate(cwds, which):
         elif "hv" in which:
             plot = "harvest"
             kd = df.loc[:, "DOY06"][0]
-        ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), scen_ws.split("_")[-1].title(), doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b")), 
+        ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), scen_ws.split("_")[-1].title(), doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b %Y")), 
                 ha='center', va='center', fontsize=24, color=text_color[i])
         ax.axis('off')
     return fig, ax
