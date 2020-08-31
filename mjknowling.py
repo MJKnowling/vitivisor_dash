@@ -92,7 +92,7 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     if which == "lai":  # yuck!
         which = "LAI"
     elif which == "fruit":
-        which = "FruitFreshWt" #"FruitDw"
+        which = "FruitDw"
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
@@ -206,14 +206,12 @@ def yield_revenue_compare(cwds, which, show_plot=True):
         keys = yields.keys()
         values = yields.values()
         bl = ax.bar(keys, values)
+        xp = [ax.get_xlim()[0] / 2, ax.get_xlim()[1] / 2]
         for i, k in enumerate(keys):
             if "base" not in k.lower():
                 bl[i].set_color('#ff7f0e')
-                ax.text(ax.get_xlim()[0] / 2, ax.get_ylim()[1] / 2, 
-                    "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=15, alpha=0.8)
-            else:
-                ax.text(ax.get_xlim()[1] / 2, ax.get_ylim()[1] / 2, 
-                    "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=15, alpha=0.8)
+            ax.text(xp[i], ax.get_ylim()[1] / 2, 
+                "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=15, alpha=0.8)
         ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
         plt.ylabel("Harvest Yield (Tonnes)")
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))

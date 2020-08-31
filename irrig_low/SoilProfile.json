@@ -32,7 +32,7 @@
       "Description" : "The depth of soil layers from surface"
     },
     "SLLL" : {
-      "Value" : [0.109,0.109,0.109,0.163,0.163,0.163,0.166,0.182,0.182,0.230,0.230,0.230,0.230,0.230,0.230],
+      "Value" : [0.149,0.149,0.149,0.2,0.2,0.2,0.2,0.202,0.202,0.250,0.250,0.250,0.250,0.250,0.250],
       "Unit" : "cm3 water /cm3 soil",
       "Description" : "Soil water lower limit"
     },
@@ -47,7 +47,7 @@
       "Description" : "Soil water saturation"
     },
     "SRGF" : {
-      "Value" : [1.0,1.0,1.0,0.75,0.75,0.75,0.35,0.2,0.2,0.1,0.0,0.0,0.0,0.0,0.0],
+      "Value" : [0.8,0.8,0.8,0.60,0.60,0.60,0.25,0.1,0.1,0.0,0.0,0.0,0.0,0.0,0.0],
       "Unit" : "",
       "Description" : "Soil hospitality factor"
     },
