@@ -92,7 +92,7 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     if which == "lai":  # yuck!
         which = "LAI"
     elif which == "fruit":
-        which = "FruitDw"
+        which = "FruitFreshWt" #"FruitDw"
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
@@ -127,7 +127,7 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
                 lai_irr_scen[scen_ws] = df
                 ax.set_ylabel("Canopy Density\n(Leaf Area Index)")
             elif which.lower() == "FruitDw".lower():
-                ax.set_ylabel("Fruit Dry Weight\n(per vine; UNITS)", color="red")
+                ax.set_ylabel("Fruit (Dry) Weight\n(per vine) (grams)")
             elif which.lower() == "Brix".lower():
                 ax.set_ylabel("Brix\n(degrees)")
             elif which == "infiltration":
@@ -161,7 +161,7 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     if "irrigation" in which and total is True:
         text_height, text_color = [0.9, 0.7], ["#1f77b4", "#ff7f0e"]
         for i, scen_ws in enumerate(cwds):
-            ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2} ML/ha)"
+            ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)"
                 .format(scen_ws.split("_")[-1].title(), q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
                 ha='center', va='center', fontsize=24, color=text_color[i])
             ax.axis('off')
@@ -185,6 +185,11 @@ def yield_revenue_compare(cwds, which, show_plot=True):
     # variables  # TODO: declare
     grape_price = 697  # $; 2019/2020 FY Riverland Shiraz grape price (see pg SA4 WA SA2020 report)
 
+    block_rowwise_dist = 89  # m
+    block_acrossrow_dist = 51  # m
+    block_area = block_rowwise_dist * block_acrossrow_dist  # m**2
+    block_area_ha = block_area * 0.0001
+
     # yield bar plot
     yields = {}
     for scen_ws in cwds:
@@ -204,8 +209,13 @@ def yield_revenue_compare(cwds, which, show_plot=True):
         for i, k in enumerate(keys):
             if "base" not in k.lower():
                 bl[i].set_color('#ff7f0e')
+                ax.text(ax.get_xlim()[0] / 2, ax.get_ylim()[1] / 2, 
+                    "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=15, alpha=0.8)
+            else:
+                ax.text(ax.get_xlim()[1] / 2, ax.get_ylim()[1] / 2, 
+                    "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=15, alpha=0.8)
         ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
-        plt.ylabel("Harvest Yield (Tonnes)\nADD TONNE/HA (14-18) TEXT ON FIGURE")
+        plt.ylabel("Harvest Yield (Tonnes)")
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
