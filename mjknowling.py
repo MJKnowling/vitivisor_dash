@@ -8,6 +8,7 @@ from datetime import datetime
 from datetime import timedelta
 import numpy as np
 import pandas as pd
+import time
 
 font = {'size': 30}
 import matplotlib
@@ -100,8 +101,8 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     #for i, ax in enumerate(ax):
     dfs = {}
     yl = []
-    if "base" in cwds[1]:
-        cwds.reverse()
+    #if "base" in cwds[1]:
+     #   cwds.reverse()
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_out_fname),
                          index_col="DayOfYear")
@@ -181,9 +182,10 @@ def kg_per_ha_to_tonnes(kg_per_ha):
     block_area = 89 * 51 * 0.0001  # ha
     return kg_per_ha * block_area * 0.001
 
-def yield_revenue_compare(cwds, which, show_plot=True):
+def yield_revenue_compare(cwds, which, d, show_plot=True):
     # variables  # TODO: declare
-    grape_price = 697  # $; 2019/2020 FY Riverland Shiraz grape price (see pg SA4 WA SA2020 report)
+    #print(d.keys())
+    #grape_price = 697.0  # $; 2019/2020 FY Riverland Shiraz grape price (see pg SA4 WA SA2020 report)
 
     block_rowwise_dist = 89  # m
     block_acrossrow_dist = 51  # m
@@ -198,17 +200,21 @@ def yield_revenue_compare(cwds, which, show_plot=True):
 
     # revenue (using grape price)
     yield_rev = yields.copy()
-    yield_rev = {x: a * grape_price for (x, a) in yield_rev.items()}
+    #print(yield_rev, scen_ws, d[scen_ws]['grape_price'])
+    yield_rev = {x: a * d[x]['grape_price'] for (x, a) in yield_rev.items()}
+    #print(yield_rev)
     
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     if which == "yield":
         keys = yields.keys()
         values = yields.values()
+        # TODO: bar only if num_scen > 1!
         bl = ax.bar(keys, values)
         xp = [ax.get_xlim()[0] / 2, ax.get_xlim()[1] / 2]
         for i, k in enumerate(keys):
-            if "base" not in k.lower():
+            if i == 0:
+            #if "base" not in k.lower():
                 bl[i].set_color('#ff7f0e')
             ax.text(xp[i], ax.get_ylim()[1] / 2, 
                 "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=15, alpha=0.8)
@@ -222,7 +228,7 @@ def yield_revenue_compare(cwds, which, show_plot=True):
         values = yield_rev.values()
         bl = ax.bar(keys, values)
         for i, k in enumerate(keys):
-            if "base" not in k.lower():
+            if i != 0:  #if "base" not in k.lower():
                 bl[i].set_color('#ff7f0e')
         ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
         plt.ylabel("Harvest Revenue ($)")
@@ -267,7 +273,7 @@ def irrig_compare(q_irr_scen, percent_entitlement=0, show_plot=True):
     values = dolla_irr_scen.values()
     b = ax.bar(keys, values)
     for i, k in enumerate(keys):
-        if "base" not in k.lower():
+        if i != 0:#if "base" not in k.lower():
             b[i].set_color('#ff7f0e')
     ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
     plt.ylabel("Irrigation Cost ($)")
@@ -300,7 +306,7 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
         values = gross_margin.values()
         b = ax.bar(keys, values)
         for i, k in enumerate(keys):
-            if "base" not in k.lower():
+            if i != 0:#if "base" not in k.lower():
                 b[i].set_color('#ff7f0e')
         ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
         plt.ylabel("Gross Margin ($)")
@@ -319,19 +325,19 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
         v = np.array(v)
         b = ax.bar(range(len(c)), v[:, 0], label="irrigation", alpha=1.0)
         for i, k in enumerate(c):
-            if "base" not in k.lower():
+            if i != 0:#if "base" not in k.lower():
                 b[i].set_color('#ff7f0e')  # assume two scens only
             else:
                 b[i].set_color('#1f77b4')
         b = ax.bar(range(len(c)), v[:, 1], bottom=v[:, 0], label="spray", alpha=0.3)
         for i, k in enumerate(c):
-            if "base" not in k.lower():
+            if i != 0:#if "base" not in k.lower():
                 b[i].set_color('#ff7f0e')  # assume two scens only
             else:
                 b[i].set_color('#1f77b4')
         b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", alpha=0.6)
         for i, k in enumerate(c):
-            if "base" not in k.lower():
+            if i != 0:#if "base" not in k.lower():
                 b[i].set_color('#ff7f0e')  # assume two scens only
             else:
                 b[i].set_color('#1f77b4')
@@ -383,6 +389,7 @@ def lai_to_spray_cost(lai_irr_scen, block_rowwise_dist, fuel_effic, fuel_cost, l
     # spray cost
     spray_cost = nsprays.copy()
     sum_costs_per_spray = fuel_consump_per_spray + labour_cost_per_spray + chemical_cost_per_spray
+    #print("cost per spray: {}".format(sum_costs_per_spray))
     spray_cost = {x: a * sum_costs_per_spray for (x, a) in spray_cost.items()}
 
     return spray_cost
@@ -409,6 +416,7 @@ def lai_to_tip_cost(lai_irr_scen, block_rowwise_dist, fuel_effic, fuel_cost, lab
     # tip cost
     tip_cost = ntips.copy()
     sum_costs_per_tip = fuel_consump_per_tip + labour_cost_per_tip
+    #print("cost per tip: {}".format(sum_costs_per_tip))
     tip_cost = {x: a * sum_costs_per_tip for (x, a) in tip_cost.items()}
 
     return tip_cost
@@ -1452,30 +1460,38 @@ def plot_ts_en(pcf, m_d, final_it):
         plt.close()
 
 
-def run_scen(irrig_scen):
-    scens = ["irrig_base"]
-    if "low" in irrig_scen:
-        irrig_scen = str("irrig_" + irrig_scen)
-        scens = [irrig_scen] + scens
-    else:
-        scens.append("irrig_" + irrig_scen)
-    for scen in scens:
-        scen_ws = os.path.join(scen)
-        #print("running {} model".format(scen_ws))
-        #run_model(wd=scen_ws)  # TODO: until R env ported...
-        #ts_plot_helper(cwd=scen_ws, fname="state_ts_{}.pdf".format(scen))
-    return scens
+def run_scen(irrig_scen, scen_d):  # TODO: kill 'irrig_scen' here
+    #print(scen_d.keys())
+    for s in scen_d.keys():
+        scen_ws = os.path.join(s)
+        print("running {} model".format(scen_ws))
+        run_model(wd=scen_ws)  # TODO: until R env ported...
+    return list(scen_d.keys())
+
+    #scens = ["irrig_base"]
+    #if "low" in irrig_scen:
+    #    irrig_scen = str("irrig_" + irrig_scen)
+    #    scens = [irrig_scen] + scens
+    #else:
+    #    scens.append("irrig_" + irrig_scen)
+    #for scen in scens:
+    #    scen_ws = os.path.join(scen)
+    #    #print("running {} model".format(scen_ws))
+    #    #run_model(wd=scen_ws)  # TODO: until R env ported...
+    #    #ts_plot_helper(cwd=scen_ws, fname="state_ts_{}.pdf".format(scen))
+    #return scens
 
     #infeas, phi = run_pestpp_opt(const_dict,risk,extra_sw_consts)
     #fig, ax = plot_scenario_dv(infeas,extra_sw_consts,risk)
     #ax.set_title(" $\phi$ (\\$/yr): {0:<15.3G}, risk: {1:<15.3G}".format(phi,risk))
     #return fig, ax
 
-def plot_scen(scens, plot):
+def plot_scen(scens, plot, scen_d):
     
-    # TODO:
+    # TODO: scenario variables
     percent_entitlement = 70  # make abs volume
     # cache vars - prob only needed when plotting stochastic variables etc
+
 
     if plot == "irrigationtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation")
@@ -1488,9 +1504,9 @@ def plot_scen(scens, plot):
         _, (fig, ax) = irrig_compare(q_irr_scen, percent_entitlement=percent_entitlement)
     elif plot == "harvestyield":
         #q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
-        _, (fig, ax) = yield_revenue_compare(cwds=scens, which="yield")
+        _, (fig, ax) = yield_revenue_compare(cwds=scens, which="yield", d=scen_d)
     elif plot == "harvestrevenue":
-        _, (fig, ax) = yield_revenue_compare(cwds=scens, which="revenue")
+        _, (fig, ax) = yield_revenue_compare(cwds=scens, which="revenue", d=scen_d)
     elif plot == "laitimeseries":
         q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="lai")
     elif plot == "fruittimeseries":
@@ -1508,7 +1524,7 @@ def plot_scen(scens, plot):
     elif plot == "costcontributions" or plot == "grossmargin":
         q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         dolla_irr_scen, _ = irrig_compare(q_irr_scen, percent_entitlement=percent_entitlement, show_plot=False)
-        revenue, _ = yield_revenue_compare(cwds=scens, which="revenue", show_plot=False)
+        revenue, _ = yield_revenue_compare(cwds=scens, which="revenue", d=scen_d, show_plot=False)
         _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="lai", show_plot=False)
         spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen)
         if plot == "grossmargin":
@@ -1531,8 +1547,8 @@ def plot_phenol_keydate(cwds, which):
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     text_height, text_color = [0.9, 0.7], ["#1f77b4", "#ff7f0e"]
-    if "base" in cwds[1]:
-        cwds.reverse()
+    #if "base" in cwds[1]:
+     #   cwds.reverse()
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
         if "bb" in which:
