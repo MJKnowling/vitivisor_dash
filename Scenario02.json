@@ -1,0 +1,15 @@
+{
+    "Scenario02":{
+        "Crush Price":{
+            "Value":697.0,
+            "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
+            "Units":"$ per tonne"
+        },
+        "Description":"Description of `Scenario02`",
+        "Maximum irrigation mm per phenology":{
+            "Value":30.0,
+            "Description":"Maximum irrigation depth (applied to all phenological stages)",
+            "Units":"mm"
+        }
+    }
+}
