@@ -1464,7 +1464,7 @@ def run_scen(irrig_scen, scen_d):  # TODO: kill 'irrig_scen' here
     #print(scen_d.keys())
     for s in scen_d.keys():
         scen_ws = os.path.join(s)
-        print("running {} model".format(scen_ws))
+        #print("running {} model".format(scen_ws))
         run_model(wd=scen_ws)  # TODO: until R env ported...
     return list(scen_d.keys())
 
