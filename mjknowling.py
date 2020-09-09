@@ -257,7 +257,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             #if i != 0:  #if "base" not in k.lower():
              #   bl[i].set_color('#ff7f0e')
             bl[i].set_color(colors[i])
-        ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
+        ax.set_xticklabels([dd[x].split("_")[-1].title() for x in keys])
         plt.ylabel("Harvest Revenue ($)")
         #plt.savefig(os.path.join("plots", "yield_revenue_irrig_scen.pdf"))
         if not show_plot is True:
