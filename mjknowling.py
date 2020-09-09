@@ -266,7 +266,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
     return yield_rev, (fig, ax)
 
 
-def irrig_compare(q_irr_scen, d, mapper, entitlement=5, show_plot=True):
+def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
 
     # variables  # TODO: pass as args to func
     #water_market_rate = 401  # $/ML - https://www.waterconnect.sa.gov.au/Systems/WTR/Pages/water-trades-allocation-charts.aspx
@@ -290,10 +290,10 @@ def irrig_compare(q_irr_scen, d, mapper, entitlement=5, show_plot=True):
     dolla_irr_scen = q_irr_scen.copy()
 
     print(dolla_irr_scen)
-    print(entitlement)
+    print(d)
 
-    dolla_irr_scen = {x: (a * d[mapper[x]]['water_delivery_rate'] if dolla_irr_scen[x] <= entitlement 
-                          else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - entitlement) * d[mapper[x]]['water_market_rate']))
+    dolla_irr_scen = {x: (a * d[mapper[x]]['water_delivery_rate'] if dolla_irr_scen[x] <= d[mapper[x]]['water_entitlement']
+                          else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - d[mapper[x]]['water_entitlement']) * d[mapper[x]]['water_market_rate']))
                           for x, a in dolla_irr_scen.items()
                           }
     print(dolla_irr_scen)
@@ -385,74 +385,78 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
 
     return fig, ax
 
-def lai_to_canopy_disease_mgmt(lai_irr_scen):
+def lai_to_canopy_disease_mgmt(lai_irr_scen, d, mapper):
     # variables
     labour_rate = 25.0  # $/hr
     fuel_cost = 1.2  # $/L  # diesel
     fuel_effic = 0.167 * 60  # L/hr; assuming 60 horsepower tractor from https://agriculture.coerco.com.au/agriculture-blog/how-to-document-diesel-fuel-consumption-on-your-farm and https://winesvinesanalytics.com/features/article/161455/Product-Focus-Narrow-Vineyard-Tractors
     block_rowwise_dist = 89 * 18  # m  # TODO: pass as arg
 
-    spray_cost = lai_to_spray_cost(lai_irr_scen, block_rowwise_dist, fuel_effic, fuel_cost, labour_rate)
-    tip_cost = lai_to_tip_cost(lai_irr_scen, block_rowwise_dist, fuel_effic, fuel_cost, labour_rate)
+    spray_cost = lai_to_spray_cost(lai_irr_scen, d, mapper)#block_rowwise_dist, fuel_effic, fuel_cost, labour_rate)
+    tip_cost = lai_to_tip_cost(lai_irr_scen, d, mapper)#block_rowwise_dist, fuel_effic, fuel_cost, labour_rate)
 
     return spray_cost, tip_cost
 
-def lai_to_spray_cost(lai_irr_scen, block_rowwise_dist, fuel_effic, fuel_cost, labour_rate):
-    spray_pass_speed = 5.0  # km/h
-    hr_per_spray = ((block_rowwise_dist + (0.1 * block_rowwise_dist)) / 1000) / spray_pass_speed
+def lai_to_spray_cost(lai_irr_scen, d, mapper):#block_rowwise_dist, fuel_effic, fuel_cost, labour_rate):
+    #spray_pass_speed = 5.0  # km/h
+    #hr_per_spray = ((block_rowwise_dist + (0.1 * block_rowwise_dist)) / 1000) / spray_pass_speed
 
     # fuel
-    fuel_consump_per_spray = fuel_effic * hr_per_spray
-    fuel_cost_per_spray = fuel_consump_per_spray * fuel_cost
+    #fuel_consump_per_spray = fuel_effic * hr_per_spray
+    #fuel_cost_per_spray = fuel_consump_per_spray * fuel_cost
     # labour
-    labour_cost_per_spray = labour_rate * hr_per_spray
+    #labour_cost_per_spray = labour_rate * hr_per_spray
     # chemical spray
     # chemical_cost = # per L
     # dilution required - including water cost?
-    chemical_cost_per_spray = 100
+    #chemical_cost_per_spray = 100
 
     # relate lai to number of sprays - viti domain knowledge required here!
     # TODO: relate lai_irr_scens to nsprays
     nsprays = lai_irr_scen.copy()
-    for k, v in lai_irr_scen.items():
-        if v.max() > 1.9:
-            nsprays[k] = 7  # 10
-        else:
-            nsprays[k] = 7
+    nsprays = {x: d[mapper[x]]['nsprays'] for x, a in nsprays.items()}
+    #for k, v in lai_irr_scen.items():
+     #   if v.max() > 1.9:
+      #      nsprays[k] = 7  # 10
+       # else:
+        #    nsprays[k] = 7
 
     # spray cost
     spray_cost = nsprays.copy()
-    sum_costs_per_spray = fuel_consump_per_spray + labour_cost_per_spray + chemical_cost_per_spray
+    #sum_costs_per_spray = fuel_consump_per_spray + labour_cost_per_spray + chemical_cost_per_spray
     #sum_costs_per_spray = d[]
-    print("cost per spray: {}".format(sum_costs_per_spray))
-    spray_cost = {x: a * sum_costs_per_spray for (x, a) in spray_cost.items()}
+    #print("cost per spray: {}".format(sum_costs_per_spray))
+    #spray_cost = {x: a * sum_costs_per_spray for (x, a) in spray_cost.items()}
+    spray_cost = {x: d[mapper[x]]['costs_per_spray'] for x, a in spray_cost.items()}    
 
     return spray_cost
 
-def lai_to_tip_cost(lai_irr_scen, block_rowwise_dist, fuel_effic, fuel_cost, labour_rate):
-    tip_pass_speed = 2.0  # km/h
-    hr_per_tip = ((block_rowwise_dist + (0.1 * block_rowwise_dist)) / 1000) / tip_pass_speed
+def lai_to_tip_cost(lai_irr_scen, d, mapper):#block_rowwise_dist, fuel_effic, fuel_cost, labour_rate):
+    #tip_pass_speed = 2.0  # km/h
+    #hr_per_tip = ((block_rowwise_dist + (0.1 * block_rowwise_dist)) / 1000) / tip_pass_speed
 
     # fuel
-    fuel_consump_per_tip = fuel_effic * hr_per_tip
-    fuel_cost_per_tip = fuel_consump_per_tip * fuel_cost
+    #fuel_consump_per_tip = fuel_effic * hr_per_tip
+    #fuel_cost_per_tip = fuel_consump_per_tip * fuel_cost
     # labour
-    labour_cost_per_tip = labour_rate * hr_per_tip
+    #labour_cost_per_tip = labour_rate * hr_per_tip
 
     # relate lai to number of tips - viti domain knowledge required here!
     # TODO: relate lai_irr_scens to ntips
     ntips = lai_irr_scen.copy()
-    for k, v in lai_irr_scen.items():
-        if v.max() > 1.9:
-            ntips[k] = 5  # 10
-        else:
-            ntips[k] = 5
+    ntips = {x: d[mapper[x]]['ntips'] for x, a in ntips.items()}
+    #for k, v in lai_irr_scen.items():
+     #   if v.max() > 1.9:
+      #      ntips[k] = 5  # 10
+       # else:
+        #    ntips[k] = 5
 
     # tip cost
     tip_cost = ntips.copy()
-    sum_costs_per_tip = fuel_consump_per_tip + labour_cost_per_tip
-    print("cost per tip: {}".format(sum_costs_per_tip))
-    tip_cost = {x: a * sum_costs_per_tip for (x, a) in tip_cost.items()}
+    #sum_costs_per_tip = fuel_consump_per_tip + labour_cost_per_tip
+    #print("cost per tip: {}".format(sum_costs_per_tip))
+    #tip_cost = {x: a * sum_costs_per_tip for (x, a) in tip_cost.items()}
+    tip_cost = {x: d[mapper[x]]['costs_per_tip'] for x, a in tip_cost.items()}   
 
     return tip_cost
 
@@ -1523,11 +1527,6 @@ def run_scen(irrig_scen, scen_d):  # TODO: kill 'irrig_scen' here
 
 def plot_scen(scens, plot, scen_d):
     
-    # TODO: scenario variables
-    entitlement = 0.2  # ML  # make abs volume
-    # cache vars - prob only needed when plotting stochastic variables etc
-
-
     if plot == "irrigationtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d)
     elif plot == "irrigationtotal":
@@ -1536,7 +1535,7 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal", d=scen_d)
     elif plot == "irrigationcost":
         q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
-        _, (fig, ax) = irrig_compare(q_irr_scen, d=scen_d, mapper=scens, entitlement=entitlement)
+        _, (fig, ax) = irrig_compare(q_irr_scen, d=scen_d, mapper=scens)
     elif plot == "harvestyield":
         #q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         _, (fig, ax) = yield_revenue_compare(cwds=scens, which="yield", d=scen_d)
@@ -1570,10 +1569,10 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="ponding", d=scen_d)
     elif plot == "costcontributions" or plot == "grossmargin":
         q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
-        dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, mapper=scens, entitlement=entitlement, show_plot=False)
+        dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, mapper=scens, show_plot=False)
         revenue, _ = yield_revenue_compare(cwds=scens, which="revenue", d=scen_d, show_plot=False)
         _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="lai", d=scen_d, show_plot=False)
-        spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen)
+        spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen, d=scen_d, mapper=scens)
         if plot == "grossmargin":
             fig, ax = gross_margin(dolla_irr_scen, revenue, which="gross_margin",
                 include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost)
