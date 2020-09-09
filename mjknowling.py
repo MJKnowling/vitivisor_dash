@@ -28,7 +28,7 @@ matplotlib.rc("font", **font)
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.ticker as mticker
-colors = ['b', 'r', 'g']  #plt.rcParams['axes.prop_cycle'].by_key()['color']
+colors = ['b', 'r', 'c']  #plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 import pyemu
 
@@ -143,6 +143,17 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 ax.set_ylabel("{} (mm/day)".format(which.replace("_", " ").title()))
             elif which == "soil_water":
                 ax.set_ylabel("Soil saturation (-)")
+            elif which == "rain":
+                ax.set_ylabel("Rainfall (mm/day))")
+            elif which == "ponding":
+                ax.set_ylabel("Ponding (cm)")
+
+            elif which == "soil_water_stress1":
+                ax.set_ylabel("{} Index (-)".format(which.replace("_", " ").title().strip("1")))
+            elif which == "Cpool":
+                ax.set_ylabel("Available Energy For \nFruit Development (FIND UNITS)")
+            elif which == "FruitSink":
+                ax.set_ylabel("Fruit Development \nEnergy Sink (FIND UNITS)")
     dfs = pd.DataFrame(dfs)
     #if which == "irrigation":
         #print(dfs.head())
@@ -167,7 +178,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         text_height, text_color = [0.9, 0.7, 0.5], [colors[x] for x in range(3)]
         for i, scen_ws in enumerate(cwds):
             ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)"
-                .format(scen_ws.split("_")[-1].title(), q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
+                .format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
                 ha='center', va='center', fontsize=24, color=text_color[i])
             ax.axis('off')
     else:
@@ -175,7 +186,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         for i, scen_ws in enumerate(cwds):
             dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
         l = [x for x in dfs.columns]
-        ax.legend([dd[x] for x in l]);
+        ax.legend([dd[x].title() for x in l]);
         ax.set_xlabel("Date")
     #plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
@@ -190,6 +201,9 @@ def kg_per_ha_to_tonnes(kg_per_ha):
     return kg_per_ha * block_area * 0.001
 
 def yield_revenue_compare(cwds, which, d, show_plot=True):
+    if not isinstance(cwds, list):  # dict
+        dd = cwds.copy()
+        cwds = list(cwds.keys())
     # variables  # TODO: declare
     #print(d.keys())
     #grape_price = 697.0  # $; 2019/2020 FY Riverland Shiraz grape price (see pg SA4 WA SA2020 report)
@@ -208,7 +222,10 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
     # revenue (using grape price)
     yield_rev = yields.copy()
     #print(yield_rev, scen_ws, d[scen_ws]['grape_price'])
-    yield_rev = {x: a * d[x]['grape_price'] for (x, a) in yield_rev.items()}
+    #print("yield rev {}".format(yield_rev))
+    #print("d {}".format(d))
+    #print("dd {}".format(dd))
+    yield_rev = {x: a * d[dd[x]]['grape_price'] for (x, a) in yield_rev.items()}
     #print(yield_rev)
     
     fig = plt.figure(figsize=figsize)
@@ -227,7 +244,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             ax.text(i, ax.get_ylim()[1] / 2, 
                 "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=14, ha='center', alpha=0.8)
         #print([tick for tick in plt.gca().get_xticklabels()])
-        ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
+        ax.set_xticklabels([dd[x].split("_")[-1].title() for x in keys])
         plt.ylabel("Harvest Yield (Tonnes)")
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))
         if not show_plot is True:
@@ -271,7 +288,7 @@ def irrig_compare(q_irr_scen, d, percent_entitlement=0, show_plot=True):
     ax = plt.subplot(111)
     dolla_irr_scen = q_irr_scen.copy()
 
-    print(dolla_irr_scen, scen_ws, d[scen_ws]['water_market_rate'], d[scen_ws]['water_delivery_rate'])
+    #print(dolla_irr_scen, scen_ws, d[scen_ws]['water_market_rate'], d[scen_ws]['water_delivery_rate'])
     #yield_rev = {x: a * d[x]['grape_price'] for (x, a) in yield_rev.items()}
 
     if percent_entitlement == 100:  # one end member
@@ -1533,6 +1550,14 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="fruit", d=scen_d)
     elif plot == "brixtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Brix", d=scen_d)
+
+    elif plot == "fruitsinkts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="FruitSink", d=scen_d)
+    elif plot == "cpoolts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Cpool", d=scen_d)
+    elif plot == "swstressts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water_stress1", d=scen_d)
+
     elif plot == "infiltrationts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="infiltration", d=scen_d)
     elif plot == "evaporationts":
@@ -1541,6 +1566,10 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water", d=scen_d)
     elif plot == "rootuptakets":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="root_uptake", d=scen_d)
+    elif plot == "raints":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="rain", d=scen_d)
+    elif plot == "pondts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="ponding", d=scen_d)
     elif plot == "costcontributions" or plot == "grossmargin":
         q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
         dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, percent_entitlement=percent_entitlement, show_plot=False)
@@ -1554,7 +1583,7 @@ def plot_scen(scens, plot, scen_d):
             fig, ax = gross_margin(dolla_irr_scen, revenue, which="cost_contribs",
                 include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost)
     elif "date" in plot:
-        fig, ax = plot_phenol_keydate(cwds=scens, which=plot)
+        fig, ax = plot_phenol_keydate(cwds=scens, which=plot, d=scen_d)
     elif plot == "underdev":
         fig = plt.figure(figsize=figsize)
         ax = plt.subplot(111)
@@ -1563,7 +1592,10 @@ def plot_scen(scens, plot, scen_d):
 
     return fig, ax
 
-def plot_phenol_keydate(cwds, which):
+def plot_phenol_keydate(cwds, which, d):
+    if not isinstance(cwds, list):  # dict
+        dd = cwds.copy()
+        cwds = list(cwds.keys())
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     text_height, text_color = [0.9, 0.7, 0.5], [colors[x] for x in range(3)] #['#1f77b4', '#ff7f0e', '#2ca02c']
@@ -1583,7 +1615,7 @@ def plot_phenol_keydate(cwds, which):
         elif "hv" in which:
             plot = "harvest"
             kd = df.loc[:, "DOY06"][0]
-        ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), scen_ws.split("_")[-1].title(), doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b %Y")), 
+        ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), dd[scen_ws].split("_")[-1].title(), doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b %Y")), 
                 ha='center', va='center', fontsize=24, color=text_color[i])
         ax.axis('off')
     return fig, ax
