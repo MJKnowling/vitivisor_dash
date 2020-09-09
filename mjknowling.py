@@ -266,7 +266,8 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
     return yield_rev, (fig, ax)
 
 
-def irrig_compare(q_irr_scen, d, percent_entitlement=0, show_plot=True):
+def irrig_compare(q_irr_scen, d, mapper, entitlement=5, show_plot=True):
+
     # variables  # TODO: pass as args to func
     #water_market_rate = 401  # $/ML - https://www.waterconnect.sa.gov.au/Systems/WTR/Pages/water-trades-allocation-charts.aspx
     #water_delivery_rate = 60  # $/ML - http://www.cit.org.au:84/Downloads/CIT%20Water%20Prices%2019%2020%20as%20at%201%20October%202019.pdf
@@ -288,18 +289,15 @@ def irrig_compare(q_irr_scen, d, percent_entitlement=0, show_plot=True):
     ax = plt.subplot(111)
     dolla_irr_scen = q_irr_scen.copy()
 
-    #print(dolla_irr_scen, scen_ws, d[scen_ws]['water_market_rate'], d[scen_ws]['water_delivery_rate'])
-    #yield_rev = {x: a * d[x]['grape_price'] for (x, a) in yield_rev.items()}
+    print(dolla_irr_scen)
+    print(entitlement)
 
-    if percent_entitlement == 100:  # one end member
-        dolla_irr_scen = {x: a * water_delivery_rate
-                          for (x, a) in dolla_irr_scen.items()}
-    elif percent_entitlement == 0:  # the other end member
-        dolla_irr_scen = {x: a * (water_market_rate + water_delivery_rate)
-                          for (x, a) in dolla_irr_scen.items()}
-    else:  # in-between - some entitled, but need to purchase some
-        dolla_irr_scen = {x: a * water_delivery_rate + (percent_entitlement / 100 * a * water_market_rate)
-                          for (x, a) in dolla_irr_scen.items()}
+    dolla_irr_scen = {x: (a * d[mapper[x]]['water_delivery_rate'] if dolla_irr_scen[x] <= entitlement 
+                          else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - entitlement) * d[mapper[x]]['water_market_rate']))
+                          for x, a in dolla_irr_scen.items()
+                          }
+    print(dolla_irr_scen)
+
     keys = dolla_irr_scen.keys()
     values = dolla_irr_scen.values()
     b = ax.bar(keys, values)
@@ -1526,7 +1524,7 @@ def run_scen(irrig_scen, scen_d):  # TODO: kill 'irrig_scen' here
 def plot_scen(scens, plot, scen_d):
     
     # TODO: scenario variables
-    percent_entitlement = 70  # make abs volume
+    entitlement = 0.2  # ML  # make abs volume
     # cache vars - prob only needed when plotting stochastic variables etc
 
 
@@ -1538,7 +1536,7 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal", d=scen_d)
     elif plot == "irrigationcost":
         q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
-        _, (fig, ax) = irrig_compare(q_irr_scen, d=scen_d, percent_entitlement=percent_entitlement)
+        _, (fig, ax) = irrig_compare(q_irr_scen, d=scen_d, mapper=scens, entitlement=entitlement)
     elif plot == "harvestyield":
         #q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
         _, (fig, ax) = yield_revenue_compare(cwds=scens, which="yield", d=scen_d)
@@ -1572,7 +1570,7 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="ponding", d=scen_d)
     elif plot == "costcontributions" or plot == "grossmargin":
         q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
-        dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, percent_entitlement=percent_entitlement, show_plot=False)
+        dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, mapper=scens, entitlement=entitlement, show_plot=False)
         revenue, _ = yield_revenue_compare(cwds=scens, which="revenue", d=scen_d, show_plot=False)
         _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="lai", d=scen_d, show_plot=False)
         spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen)
