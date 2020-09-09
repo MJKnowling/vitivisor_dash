@@ -89,7 +89,10 @@ def mm_to_ML_irrig(mm):
     total_ML = mm * 0.001 * irrig_area * 0.001
     return total_ML, total_ML / (irrig_area * 0.0001)
 
-def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
+def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
+    if not isinstance(cwds, list):  # dict
+        dd = cwds.copy()
+        cwds = list(cwds.keys())
     if which == "lai":  # yuck!
         which = "LAI"
     elif which == "fruit":
@@ -103,6 +106,7 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
     yl = []
     #if "base" in cwds[1]:
      #   cwds.reverse()
+    #print(d)
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_out_fname),
                          index_col="DayOfYear")
@@ -170,7 +174,8 @@ def ts_compare_irrig_plot(cwds, which, show_plot=True, total=False):
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
         for i, scen_ws in enumerate(cwds):
             dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
-        ax.legend([x.split("_")[-1].title() for x in dfs.columns]);
+        l = [x for x in dfs.columns]
+        ax.legend([dd[x] for x in l]);
         ax.set_xlabel("Date")
     #plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
@@ -1509,13 +1514,13 @@ def plot_scen(scens, plot, scen_d):
 
 
     if plot == "irrigationtimeseries":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d)
     elif plot == "irrigationtotal":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", total=True)
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, total=True)
     elif plot == "irrigationtotal":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal", d=scen_d)
     elif plot == "irrigationcost":
-        q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
+        q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
         _, (fig, ax) = irrig_compare(q_irr_scen, d=scen_d, percent_entitlement=percent_entitlement)
     elif plot == "harvestyield":
         #q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
@@ -1523,24 +1528,24 @@ def plot_scen(scens, plot, scen_d):
     elif plot == "harvestrevenue":
         _, (fig, ax) = yield_revenue_compare(cwds=scens, which="revenue", d=scen_d)
     elif plot == "laitimeseries":
-        q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="lai")
+        q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="lai", d=scen_d)
     elif plot == "fruittimeseries":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="fruit")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="fruit", d=scen_d)
     elif plot == "brixtimeseries":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Brix")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Brix", d=scen_d)
     elif plot == "infiltrationts":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="infiltration")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="infiltration", d=scen_d)
     elif plot == "evaporationts":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="evap")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="evap", d=scen_d)
     elif plot == "soilmoisturets":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water", d=scen_d)
     elif plot == "rootuptakets":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="root_uptake")
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="root_uptake", d=scen_d)
     elif plot == "costcontributions" or plot == "grossmargin":
-        q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", show_plot=False)
+        q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
         dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, percent_entitlement=percent_entitlement, show_plot=False)
         revenue, _ = yield_revenue_compare(cwds=scens, which="revenue", d=scen_d, show_plot=False)
-        _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="lai", show_plot=False)
+        _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="lai", d=scen_d, show_plot=False)
         spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen)
         if plot == "grossmargin":
             fig, ax = gross_margin(dolla_irr_scen, revenue, which="gross_margin",
