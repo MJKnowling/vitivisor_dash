@@ -7,7 +7,7 @@ dependencies:
   - scipy
   - matplotlib
   - pandas
-  - ipyleaflet
+#  - ipyleaflet
   - ipywidgets
   - appmode
 #  - pip
