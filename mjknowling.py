@@ -83,11 +83,12 @@ def mm_to_ML_irrig(mm):
     # LRC block 47 area (email from Ryan Tan and accounting for drip line only around line
     block_rowwise_dist = 89  # m
     vine_rows = 18
-    #irrig_width = 0.1  # m  # TODO: align with zone approach in VineLOGIC
-    #irrig_area = block_rowwise_dist * (irrig_width * vine_rows)
-    irrig_area = block_rowwise_dist * 51  # total area in m2
+    irrig_width = 1.5  # m  # TODO: align with zone approach in VineLOGIC
+    irrig_area = block_rowwise_dist * (irrig_width * vine_rows)
+    #irrig_area = block_rowwise_dist * 51  # total area in m2
     total_ML = mm * 0.001 * irrig_area * 0.001
-    return total_ML, total_ML / (irrig_area * 0.0001)
+    #print(mm, total_ML, mm * 0.001 * (block_rowwise_dist * 51) * 0.001)
+    return total_ML, total_ML / (block_rowwise_dist * 51 * 0.0001)  # tota, total per ha
 
 def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
     if not isinstance(cwds, list):  # dict
@@ -144,7 +145,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which == "soil_water":
                 ax.set_ylabel("Soil saturation (-)")
             elif which == "rain":
-                ax.set_ylabel("Rainfall (mm/day))")
+                ax.set_ylabel("Rainfall (mm/day)")
             elif which == "ponding":
                 ax.set_ylabel("Ponding (cm)")
 
@@ -176,6 +177,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
     #else:
     if "irrigation" in which and total is True:
         text_height, text_color = [0.9, 0.7, 0.5], [colors[x] for x in range(3)]
+        print(q_irr_per_ha_scen)
         for i, scen_ws in enumerate(cwds):
             ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)"
                 .format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
@@ -186,7 +188,10 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         for i, scen_ws in enumerate(cwds):
             dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
         l = [x for x in dfs.columns]
-        ax.legend([dd[x].title() for x in l]);
+        if "irrig" in which:
+            ax.legend([dd[x].title() for x in l], loc='upper right')
+        else:
+            ax.legend([dd[x].title() for x in l])
         ax.set_xlabel("Date")
     #plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
@@ -289,14 +294,14 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
     ax = plt.subplot(111)
     dolla_irr_scen = q_irr_scen.copy()
 
-    print(dolla_irr_scen)
-    print(d)
+    #print(dolla_irr_scen)
+    #print(d)
 
     dolla_irr_scen = {x: (a * d[mapper[x]]['water_delivery_rate'] if dolla_irr_scen[x] <= d[mapper[x]]['water_entitlement']
                           else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - d[mapper[x]]['water_entitlement']) * d[mapper[x]]['water_market_rate']))
                           for x, a in dolla_irr_scen.items()
                           }
-    print(dolla_irr_scen)
+    #print(dolla_irr_scen)
 
     keys = dolla_irr_scen.keys()
     values = dolla_irr_scen.values()
@@ -305,7 +310,8 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
         #if i != 0:#if "base" not in k.lower():
          #   b[i].set_color('#ff7f0e')
         b[i].set_color(colors[i])
-    ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
+    #print(d, mapper, keys)
+    ax.set_xticklabels([mapper[x].split("_")[-1].title() for x in keys])
     plt.ylabel("Irrigation Cost ($)")
     #plt.savefig(os.path.join("plots", "cost_irrig_scen.pdf"))
     if not show_plot is True:
@@ -319,7 +325,7 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
     return dolla_irr_scen, (fig, ax)
 
 
-def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0, include_canopy_mgmt=True,
+def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, tip_cost=0.0, include_canopy_mgmt=True,
                  include_disease_mgmt=True):
     revenue = grape_revenue
     cost = irrig_cost
@@ -339,7 +345,7 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')
             b[i].set_color(colors[i])
-        ax.set_xticklabels([x.split("_")[-1].title() for x in keys])
+        ax.set_xticklabels([mapper[x].split("_")[-1].title() for x in keys])
         plt.ylabel("Gross Margin ($)")
         #plt.savefig(os.path.join("plots", "gross_margin.pdf"))
         #plt.close()
@@ -354,7 +360,7 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
             c.append(key)
             v.append(val)
         v = np.array(v)
-        b = ax.bar(range(len(c)), v[:, 0], label="irrigation", alpha=1.0)
+        b = ax.bar(range(len(c)), v[:, 0], label="irrigation", alpha=1.0,)
         for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
@@ -368,7 +374,7 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
             #else:
              #   b[i].set_color('#1f77b4')
             b[i].set_color(colors[i])
-        b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", alpha=0.6)
+        b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", alpha=0.7)
         for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
@@ -377,7 +383,7 @@ def gross_margin(irrig_cost, grape_revenue, which, spray_cost=0.0, tip_cost=0.0,
             b[i].set_color(colors[i])
         ax.legend()
         plt.xticks(range(len(c)), c)
-        ax.set_xticklabels([x.split("_")[-1].title() for x in c])
+        ax.set_xticklabels([mapper[x].split("_")[-1].title() for x in c])
         plt.ylabel("Cost Contributions ($)")
         plt.show()
         #plt.savefig(os.path.join("plots", "cost_contribs.pdf"))
@@ -1574,10 +1580,10 @@ def plot_scen(scens, plot, scen_d):
         _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="lai", d=scen_d, show_plot=False)
         spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen, d=scen_d, mapper=scens)
         if plot == "grossmargin":
-            fig, ax = gross_margin(dolla_irr_scen, revenue, which="gross_margin",
+            fig, ax = gross_margin(dolla_irr_scen, revenue, which="gross_margin", d=scen_d, mapper=scens,
                 include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost)
         else:
-            fig, ax = gross_margin(dolla_irr_scen, revenue, which="cost_contribs",
+            fig, ax = gross_margin(dolla_irr_scen, revenue, which="cost_contribs", d=scen_d, mapper=scens,
                 include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost)
     elif "date" in plot:
         fig, ax = plot_phenol_keydate(cwds=scens, which=plot, d=scen_d)
