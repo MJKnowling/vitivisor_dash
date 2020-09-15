@@ -1,2 +1,0 @@
-a <- "testing"
-print(a)
