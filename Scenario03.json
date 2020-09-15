@@ -5,11 +5,61 @@
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
             "Units":"$ per tonne"
         },
-        "Description":"Description of `Scenario03`",
+        "Description":"Description of `Scenario02`",
         "Maximum irrigation mm per phenology":{
-            "Value":100.0,
+            "Value":15.0,
             "Description":"Maximum irrigation depth (applied to all phenological stages)",
             "Units":"mm"
+        },
+        "Soil water irrigation trigger per phenology":{
+            "Value":65.0,
+            "Description":"Maximum irrigation depth (applied to all phenological stages)",
+            "Units":"%"
+        },
+        "Soil water irrigation defict refill percent per phenology":{
+            "Value":5.0,
+            "Description":"Maximum irrigation depth (applied to all phenological stages)",
+            "Units":"%"
+        },
+        "Days between irrigation applications per phenology":{
+            "Value":4.0,
+            "Description":"Maximum irrigation depth (applied to all phenological stages)",
+            "Units":"days"
+        },
+        "Water delivery cost":{
+            "Value":60.0,
+            "Description":"Variable water delivery cost; CIT on-peak is $60 per ML",
+            "Units":"$ per ML"
+        },
+        "Water market cost":{
+            "Value":401.0,
+            "Description":"Water market price at purchase. This is not used if entitlement exceeds irrigation volume. Note: $401 per ML is volume-weighted average Price for 2019-2020",
+            "Units":"$ per ML"
+        },
+        "Water entitlement":{
+            "Value":2.0,
+            "Description":"Water entitlement for season (SA)",
+            "Units":"ML"
+        },
+        "Cost per spray":{
+            "Value":1000.0,
+            "Description":"Cost of average spray pass, including chemical, labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
+            "Units":"$"
+        },
+        "Cost per tip":{
+            "Value":150.0,
+            "Description":"Cost of average spray pass, including labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
+            "Units":"$"
+        },
+        "Number of sprays":{
+            "Value":7,
+            "Description":"Number of spray applications for season",
+            "Units":""
+        },
+        "Number of tips":{
+            "Value":2,
+            "Description":"Number of spray applications for season",
+            "Units":""
         }
     }
 }

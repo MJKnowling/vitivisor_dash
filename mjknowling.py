@@ -177,7 +177,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
     #else:
     if "irrigation" in which and total is True:
         text_height, text_color = [0.9, 0.7, 0.5], [colors[x] for x in range(3)]
-        print(q_irr_per_ha_scen)
+        #print(q_irr_per_ha_scen)
         for i, scen_ws in enumerate(cwds):
             ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)"
                 .format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
