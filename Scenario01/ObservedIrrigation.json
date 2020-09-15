@@ -1,0 +1,18 @@
+{
+  "FileDescription" : "This file contains recorded irrigation data",
+  "NIRR" : {
+    "Value" : 60,
+    "Unit" : "Number",
+    "Description" : "Number of irrigations"
+  },
+  "IRRCOD" : {
+    "Value" : [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "Unit" : "NA",
+    "Description" : ""
+  },
+  "IRRWATEREC" : {
+    "Value" : [0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2],
+    "Unit" : "NA",
+    "Description" : ""
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "FileDescription" : "This file contains inputs for harvest time",
+  "HarvestBrix" : {
+    "Value" : 24.5,
+    "Units" : "DegreesBx",
+    "Description" : "Target Brix for harvest"
+  }
+}

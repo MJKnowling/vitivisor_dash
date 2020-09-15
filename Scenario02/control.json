@@ -1,0 +1,38 @@
+{
+  "FileDescription" : "This file contains parameters previously hard coded in VineLOGIC",
+  "RootCho" : {
+    "Value" : 80,
+    "Units" : "g/Kg",
+    "Description" : "Root carbohydrate per kg of dry matter"
+  },
+  "RootDwFrac" : {
+    "Value" : 0.65,
+    "Units" : "NA",
+    "Description" : "Root Dry weight, as a fraction of trunk dry weight"
+  },
+  "Tbase" : {
+    "Value" : 7.5,
+    "Units" : "DegreesCelcius",
+    "Description" : "Baseline temperature for thermal time calculations"
+  },
+  "CritWFPS" : {
+    "Value" : 0.65,
+    "Units" : "",
+    "Description" : "Critical limit for water filled pore space"
+  },
+  "MaxRootDepth" : {
+    "Value" : 100,
+    "Units" : "cm",
+    "Description" : "Maximum root depth"
+  },
+  "Setdd" : {
+    "Value" : 200,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "A thermal time requirement after first flower"
+  },
+  "maxLAI" : {
+    "Value" : 5,
+    "Units" : "NA",
+    "Description" : "An upper limit on Leaf Area Index growth"
+  }
+}

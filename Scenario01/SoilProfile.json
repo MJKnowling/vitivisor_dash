@@ -1,0 +1,70 @@
+{
+  "FileDescription" : "This file contains initial conditions to be used in soil layer calculations",
+  "Family" : {
+    "Value" : "Loam",
+    "Unit" : "NA",
+    "Description" : "Soil Type"
+  },
+  "SALB" : {
+    "Value" : 0.13,
+    "Unit" : "NA",
+    "Description" : "Soil Albedo"
+  },
+  "Pond" : {
+    "Value" : 5.0,
+    "Unit" : "cm",
+    "Description" : "Maximum amount of water that can be stored in ponding"
+  },
+  "KSMX" : {
+    "Value" : 5.0,
+    "Unit" : "cm/s",
+    "Description" : "Saturated Hydraulic conductivity"
+  },
+  "CAPF" : {
+    "Value" : 20.0,
+    "Unit" : "cm",
+    "Description" : "The capillary fringe depth"
+  },
+  "SoilLayerProperties" : {
+    "Layer" : {
+      "Value" : [5.0,10.0,15.0,20.0,25.0,30.0,40.0,50.0,60.0,70.0,80.0,90.0,120.0,160.0,200.0],
+      "Unit" : "cm",
+      "Description" : "The depth of soil layers from surface"
+    },
+    "SLLL" : {
+      "Value" : [0.129,0.129,0.129,0.2,0.2,0.2,0.2,0.202,0.202,0.250,0.250,0.250,0.250,0.250,0.250],
+      "Unit" : "cm3 water /cm3 soil",
+      "Description" : "Soil water lower limit"
+    },
+    "SDUL" : {
+      "Value" : [0.237,0.237,0.237,0.289,0.289,0.289,0.288,0.300,0.300,0.352,0.352,0.352,0.352,0.352,0.352],
+      "Unit" : "cm3 water /cm3 soil",
+      "Description" : "Soil water drained upper limit"
+    },
+    "SSAT" : {
+      "Value" : [0.376,0.376,0.376,0.370,0.370,0.370,0.353,0.352,0.352,0.364,0.364,0.364,0.364,0.364,0.364],
+      "Unit" : "cm3 water /cm3 soil",
+      "Description" : "Soil water saturation"
+    },
+    "SRGF" : {
+      "Value" : [0.9,0.9,0.9,0.80,0.80,0.80,0.5,0.2,0.2,0.2,0.0,0.0,0.0,0.0,0.0],
+      "Unit" : "",
+      "Description" : "Soil hospitality factor"
+    },
+    "SSKS" : {
+      "Value" : [20.0,20.0,20.0,5.0,5.0,5.0,3.0,1.0,1.0,0.1,0.1,0.1,0.1,0.1,0.1],
+      "Unit" : "",
+      "Description" : "Macroscopic hydraulic conductivity"
+    },
+    "SBDM" : {
+      "Value" : [1.48,1.48,1.48,1.50,1.50,1.50,1.55,1.55,1.55,1.52,1.52,1.52,1.52,1.52,1.52],
+      "Unit" : "",
+      "Description" : "Bulk density"
+    },
+    "RWUC" : {
+      "Value" : [1.0,1.0,1.0,0.8,0.8,0.8,0.4,0.4,0.4,0.2,0.2,0.2,0.2,0.2,0.2],
+      "Unit" : "",
+      "Description" : "Root water uptake at maximum canopy development"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "FileDescription" : "This file contains parameters for hydrological calculations",
+  "TruDepWt" : {
+    "Value" : 2.0,
+    "Unit" : "m",
+    "Description" : "Depth of Water Table"
+  },
+  "BotBoundFlux" : {
+    "Value" : 0.001,
+    "Unit" : "",
+    "Description" : ""
+  }
+}
