@@ -1,0 +1,40 @@
+
+C:\Users\a1228350\Dev\vitivisor_dash>R CMD INSTALL VineLOGIC_0.1.0.tar.gz 
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Begro.f -o Begro.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Caleo.f -o Caleo.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Drainage.f -o Drainage.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Eqwt.f -o Eqwt.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c FFindexcal.f -o FFindexcal.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Idlayrsub.f -o Idlayrsub.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Interception.f -o Interception.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c PiezLevel.f -o PiezLevel.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Ponding.f -o Ponding.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Rainfunc.f -o Rainfunc.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Rootgrowth.f -o Rootgrowth.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Rquotient.f -o Rquotient.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Tpfunc.f -o Tpfunc.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Upflow.f -o Upflow.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Vcangro.f -o Vcangro.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c Wuptake.f -o Wuptake.o
+c:/Rtools/mingw_32/bin/gfortran      -O3  -mtune=generic -c test.f -o test.o
+c:/Rtools/mingw_32/bin/gcc -shared -s -static-libgcc -o VineLOGIC.dll tmp.def Begro.o Caleo.o Drainage.o Eqwt.o FFindexcal.o Idlayrsub.o Interception.o PiezLevel.o Ponding.o Rainfunc.o Rootgrowth.o Rquotient.o Tpfunc.o Upflow.o Vcangro.o Wuptake.o test.o -lgfortran -lm -lquadmath -LC:/PROGRA~1/R/R-36~1.0/bin/i386 -lR
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Begro.f -o Begro.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Caleo.f -o Caleo.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Drainage.f -o Drainage.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Eqwt.f -o Eqwt.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c FFindexcal.f -o FFindexcal.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Idlayrsub.f -o Idlayrsub.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Interception.f -o Interception.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c PiezLevel.f -o PiezLevel.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Ponding.f -o Ponding.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Rainfunc.f -o Rainfunc.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Rootgrowth.f -o Rootgrowth.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Rquotient.f -o Rquotient.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Tpfunc.f -o Tpfunc.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Upflow.f -o Upflow.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Vcangro.f -o Vcangro.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c Wuptake.f -o Wuptake.o
+c:/Rtools/mingw_64/bin/gfortran      -O2  -mtune=generic -c test.f -o test.o
+c:/Rtools/mingw_64/bin/gcc -shared -s -static-libgcc -o VineLOGIC.dll tmp.def Begro.o Caleo.o Drainage.o Eqwt.o FFindexcal.o Idlayrsub.o Interception.o PiezLevel.o Ponding.o Rainfunc.o Rootgrowth.o Rquotient.o Tpfunc.o Upflow.o Vcangro.o Wuptake.o test.o -lgfortran -lm -lquadmath -LC:/PROGRA~1/R/R-36~1.0/bin/x64 -lR
+  converting help for package 'VineLOGIC'
+    vines                                   html  
