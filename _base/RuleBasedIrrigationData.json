@@ -45,6 +45,11 @@
     "Unit" : "mm",
     "Description" : "Maximum irrigation total, for each major growth stage"
   },
+  "IRDAYSTAGECAP" : {
+    "Value" : [4.0,4.0,4.0,4.0,4.0],
+    "Unit" : "mm",
+    "Description" : "Maximum daily irrigation, for each major growth stage"
+  },
   "IRCUMNETET" : {
     "Value" : [0.0,0.0,0.0,0.0,0.0],
     "Unit" : "mm",

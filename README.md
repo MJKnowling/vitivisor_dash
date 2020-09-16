@@ -4,7 +4,7 @@
 
 This repository is under developement as part of the VitiVisor project. It is designed to showcase some of the prediction and advisory aspects of the project in a streamlined fashion.
 
-# Instructions:
+## Instructions:
 
 Launch the Binder using a link provided or by clicking the `launch binder` badge above. This may take a little while. We are working to reduce the time this takes.
 
