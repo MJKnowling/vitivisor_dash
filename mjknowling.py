@@ -98,6 +98,8 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         which = "LAI"
     elif which == "fruit":
         which = "FruitDw"
+    elif which == "supplydemand":
+        which = ["FruitSink", "Cpool"]
     fig = plt.figure(figsize=figsize)
     ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
@@ -155,6 +157,12 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 ax.set_ylabel("Available Energy For \nFruit Development (FIND UNITS)")
             elif which == "FruitSink":
                 ax.set_ylabel("Fruit Development \nEnergy Sink (FIND UNITS)")
+            elif which == "supplydemand":
+                ax.set_ylabel("Fruit Energy Demand versus Available Energy")
+            elif which == "VineEop":
+                ax.set_ylabel("Potential Vine ET (cm/day)")
+            elif which == "Tru":
+                ax.set_ylabel("Potential Root Uptake (?) (cm/day)")
     dfs = pd.DataFrame(dfs)
     #if which == "irrigation":
         #print(dfs.head())
@@ -186,7 +194,11 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
         for i, scen_ws in enumerate(cwds):
-            dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
+            if which == "supplydemand":
+                # TODO
+                pass
+            else:
+                dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
         l = [x for x in dfs.columns]
         if "irrig" in which:
             ax.legend([dd[x].title() for x in l], loc='upper right')
@@ -1560,6 +1572,12 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Cpool", d=scen_d)
     elif plot == "swstressts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water_stress1", d=scen_d)
+    #elif plot == "supplydemand":
+     #   _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="supply_demand", d=scen_d)
+    elif plot == "VineEop":
+         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="VineEop", d=scen_d)
+    elif plot == "Tru":
+         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Tru", d=scen_d)
 
     elif plot == "infiltrationts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="infiltration", d=scen_d)
