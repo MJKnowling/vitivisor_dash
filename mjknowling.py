@@ -200,6 +200,15 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             else:
                 dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
         l = [x for x in dfs.columns]
+        if which == "soil_water":  # put soil limits here for reference
+            xlim = ax.get_xlim()
+            sp = pd.read_json(os.path.join("_base", "SoilProfile.json"))
+            vs = ["SLLL", "SDUL", "SSAT"]
+            for vi in vs:
+                v = np.mean(sp["SoilLayerProperties"][vi]["Value"])
+                ax.axhline(y=v, linewidth=2, linestyle='--', color='k', alpha=0.8)
+                ax.text(x=xlim[1] - (0.15 * (xlim[1] - xlim[0])), y=v + 0.005, 
+                        s="$\it{}$".format(vi), fontsize=12, alpha=0.8)
         if "irrig" in which:
             ax.legend([dd[x].title() for x in l], loc='upper right')
         else:
