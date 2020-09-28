@@ -83,7 +83,7 @@ def mm_to_ML_irrig(mm):
     # LRC block 47 area (email from Ryan Tan and accounting for drip line only around line
     block_rowwise_dist = 89  # m
     vine_rows = 18
-    irrig_width = 1.5  # m  # TODO: align with zone approach in VineLOGIC
+    irrig_width = 2.5  # m  # TODO: align with zone approach in VineLOGIC
     irrig_area = block_rowwise_dist * (irrig_width * vine_rows)
     #irrig_area = block_rowwise_dist * 51  # total area in m2
     total_ML = mm * 0.001 * irrig_area * 0.001
@@ -100,12 +100,17 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         which = "FruitDw"
     elif which == "supplydemand":
         which = ["FruitSink", "Cpool"]
-    fig = plt.figure(figsize=figsize)
-    ax = plt.subplot(111)
+    if which == "soil_water":
+        fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=figsize)
+        axs = np.array(axs)
+    else:
+        fig = plt.figure(figsize=figsize)
+        ax = plt.subplot(111)
     q_irr_scen, lai_irr_scen = {}, {}
     q_irr_per_ha_scen, q_mm_total = {}, {}
+    rain_season_total, rain_annual_total = {}, {}
     #for i, ax in enumerate(ax):
-    dfs = {}
+    dfs, dfs_ref, dfs_all = {}, {}, {}
     yl = []
     #if "base" in cwds[1]:
      #   cwds.reverse()
@@ -115,12 +120,26 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                          index_col="DayOfYear")
         dates = pd.date_range(start_date, periods=daily_time_steps)
         df.index = dates
+        if which == "rain":
+            df_all = df.copy()
+            df_all = df.loc[datetime.strftime(start_date + timedelta(365 + 365/2 - 1), '%Y-%m-%d'):
+                            datetime.strftime(start_date + timedelta(365 + 365*1.5 - 1), '%Y-%m-%d'), :]
+            df_all = df_all.loc[:, which]
         df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 61), '%Y-%m-%d'):
-        datetime.strftime(start_date + timedelta(900), '%Y-%m-%d'), :]
-        df = df.loc[:, which]
-        yl.append(ax.get_ylim()[1])
-        xl = ax.get_xlim()[1]
+                    datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
+        if which == "ATheta":# or which == "soil_water":
+            df_ref = df.loc[:, "IRCRITSW"]
+            dfs_ref[scen_ws] = df_ref
+        if which == "soil_water":
+            sw_states = ["soil_water_top", "soil_water_mid", "soil_water_bot"]
+            df = df.loc[:, sw_states]
+        else:
+            yl.append(ax.get_ylim()[1])
+            xl = ax.get_xlim()[1]
+            df = df.loc[:, which]
         dfs[scen_ws] = df
+        if which == "rain" and total is True:
+            dfs_all[scen_ws] = df_all
         if "irrigation" in which:
             q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
             #print(df.loc[df.values>0.0])
@@ -130,7 +149,12 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             q_mm_total[scen_ws] = df.sum()
             q_irr_per_ha_scen[scen_ws] = q_per_ha
             ax.set_ylabel(which.title() + "\n(mm/day)")
-        else:
+        elif which == "rain":
+            if total is True:
+                rain_season_total[scen_ws] = df.sum()  # seasonal
+                rain_annual_total[scen_ws] = df_all.sum()  # annual - take hydrological year
+            ax.set_ylabel("Rainfall (mm/day)")
+        elif which != "soil_water":
             if which.lower() == "LAI".lower():
                 lai_irr_scen[scen_ws] = df
                 ax.set_ylabel("Canopy Density\n(Leaf Area Index)")
@@ -139,17 +163,20 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which.lower() == "Brix".lower():
                 ax.set_ylabel("Brix\n(degrees)")
             elif which == "infiltration":
-                ax.set_ylabel("{} (mm/day)".format(which.title()))
+                ax.set_ylabel("{} (cm/day)".format(which.title()))
             elif which == "evap":
-                ax.set_ylabel("{}oration (mm/day)".format(which.title()))
+                ax.set_ylabel("{}oration (cm/day)".format(which.title()))
             elif which == "root_uptake":
                 ax.set_ylabel("{} (mm/day)".format(which.replace("_", " ").title()))
-            elif which == "soil_water":
-                ax.set_ylabel("Soil saturation (-)")
-            elif which == "rain":
-                ax.set_ylabel("Rainfall (mm/day)")
+            #elif which == "soil_water":
+             #   ax.set_ylabel("Soil saturation (-)")
+            elif which == "ATheta":
+                ax.set_ylabel("XXX (= $\Sigma^{nlayr}_{1}$ (Sw - Wilting Point) * dz / Sigma^{nlayr}_{1}$ (Field Capacity - Wilting Point) * dz")
+
             elif which == "ponding":
                 ax.set_ylabel("Ponding (cm)")
+            elif which == "runoff":
+                ax.set_ylabel("Surface Runoff (?)")
 
             elif which == "soil_water_stress1":
                 ax.set_ylabel("{} Index (-)".format(which.replace("_", " ").title().strip("1")))
@@ -163,7 +190,12 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 ax.set_ylabel("Potential Vine ET (cm/day)")
             elif which == "Tru":
                 ax.set_ylabel("Potential Root Uptake (?) (cm/day)")
-    dfs = pd.DataFrame(dfs)
+    if which != "soil_water":
+        dfs = pd.DataFrame(dfs)
+    if which == "ATheta":# or which == "soil_water":
+        dfs_ref = pd.DataFrame(dfs_ref)
+    if which == "rain" and total is True:
+        dfs_all = pd.DataFrame(dfs_all)
     #if which == "irrigation":
         #print(dfs.head())
         #ind = np.arange(len(dfs))
@@ -183,13 +215,18 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         #ax.xaxis.set_major_formatter(mticker.FixedFormatter(ticklabels))
         #ax.xaxis.set_minor_formatter(mticker.FixedFormatter(ticklabels))
     #else:
-    if "irrigation" in which and total is True:
-        text_height, text_color = [0.9, 0.7, 0.5], [colors[x] for x in range(3)]
+    if ("irrigation" in which and total is True) or ("rain" in which and total is True):
+        text_height_irr, text_color, text_height_rain = [0.9, 0.7, 0.5], [colors[x] for x in range(3)], [0.9, 0.6, 0.3]
         #print(q_irr_per_ha_scen)
         for i, scen_ws in enumerate(cwds):
-            ax.text(xl / 2, max(yl) * text_height[i], "Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)"
-                .format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
-                ha='center', va='center', fontsize=24, color=text_color[i])
+            if "irrigation" in which:
+                ax.text(x=xl / 2, y=max(yl) * text_height_irr[i], 
+                    s="Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)".format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
+                    ha='center', va='center', fontsize=24, color=text_color[i])
+            elif "rain" in which:
+                ax.text(x=xl / 2, y=max(yl) * text_height_rain[i], 
+                    s="Rainfall Totals ({0}):\n  Seasonal (Sep-May): {1:.1f} mm\n  Annual (Jul-Jun): {2:.1f} mm".format(dd[scen_ws], rain_season_total[scen_ws], rain_annual_total[scen_ws]), 
+                    ha='center', va='center', fontsize=24, color=text_color[i])
             ax.axis('off')
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
@@ -197,23 +234,46 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             if which == "supplydemand":
                 # TODO
                 pass
+            elif which == "soil_water":
+                sp = pd.read_json(os.path.join("_base", "SoilProfile.json"))
+                vs = {"SLLL": "wilting point", "SDUL": "field capacity", "SSAT": "saturation"}
+                zs = {0: [0, 5], 1: [7, 50], 2: [14, 200]}  # lay and depth pairs
+                for ii, ax in enumerate(axs.reshape(-1)):
+                    dfs[scen_ws][sw_states[ii]].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
+                    xlim = ax.get_xlim()
+                    ax.set_ylabel("Soil Water\n Content (-)\n At Depth \n{0} cm".format(str(zs[ii][1])))
+                    ax.set_ylim(0, 0.5)
+                    if ii == ((axs.shape[0]) - 1):
+                        ax.set_xlabel("Date")
+                    if i == len(cwds) - 1:  # these are fixed variables
+                        for vi in vs.items():
+                            #v = np.mean(sp["SoilLayerProperties"][vi[0]]["Value"])
+                            v = sp["SoilLayerProperties"][vi[0]]["Value"][zs[ii][0]]
+                            ax.axhline(y=v, linewidth=2, linestyle='--', color='k', alpha=0.8)
+                            props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
+                            if vi[0] == "SDUL":
+                                _x = xlim[0] + (0.05 * (xlim[1] - xlim[0]))
+                            else:
+                                _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
+                            ax.text(x=_x, y=v + 0.005, 
+                                    s="{}".format(vi[1].title()), fontsize=12, alpha=1.0, bbox=props)
+                    #ax.set_xlim(xlim)
             else:
                 dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
-        l = [x for x in dfs.columns]
-        if which == "soil_water":  # put soil limits here for reference
-            xlim = ax.get_xlim()
-            sp = pd.read_json(os.path.join("_base", "SoilProfile.json"))
-            vs = ["SLLL", "SDUL", "SSAT"]
-            for vi in vs:
-                v = np.mean(sp["SoilLayerProperties"][vi]["Value"])
-                ax.axhline(y=v, linewidth=2, linestyle='--', color='k', alpha=0.8)
-                ax.text(x=xlim[1] - (0.15 * (xlim[1] - xlim[0])), y=v + 0.005, 
-                        s="$\it{}$".format(vi), fontsize=12, alpha=0.8)
+                xlim = ax.get_xlim()
+                #print(xlim)
+        if which == "soil_water":
+            l = [x for x in dfs.keys()]
+        else:
+            l = [x for x in dfs.columns]
+        for i, scen_ws in enumerate(cwds):
+            if which == "ATheta":# or which == "soil_water": 
+                dfs_ref[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i], linestyle='--')
         if "irrig" in which:
             ax.legend([dd[x].title() for x in l], loc='upper right')
-        else:
+        elif which != "soil_water":
             ax.legend([dd[x].title() for x in l])
-        ax.set_xlabel("Date")
+            ax.set_xlabel("Date")
     #plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
         plt.close()
@@ -1553,13 +1613,13 @@ def run_scen(irrig_scen, scen_d):  # TODO: kill 'irrig_scen' here
     #return fig, ax
 
 def plot_scen(scens, plot, scen_d):
-    
+
     if plot == "irrigationtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d)
     elif plot == "irrigationtotal":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, total=True)
-    elif plot == "irrigationtotal":
-        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal", d=scen_d)
+    #elif plot == "irrigationtotal":
+     #   _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="irrigationtotal", d=scen_d)
     elif plot == "irrigationcost":
         q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
         _, (fig, ax) = irrig_compare(q_irr_scen, d=scen_d, mapper=scens)
@@ -1592,14 +1652,28 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="infiltration", d=scen_d)
     elif plot == "evaporationts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="evap", d=scen_d)
+    elif plot == "drainagets":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="drainage", d=scen_d)
+    elif plot == "watertablets":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="water_table", d=scen_d)
     elif plot == "soilmoisturets":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water", d=scen_d)
+    elif plot == "athetats":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="ATheta", d=scen_d)
+    elif plot == "tswtopts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="TswTop", d=scen_d)
+    elif plot == "wet1ts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Wet1", d=scen_d)
     elif plot == "rootuptakets":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="root_uptake", d=scen_d)
     elif plot == "raints":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="rain", d=scen_d)
+    elif plot == "raintotal":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="rain", d=scen_d, total=True)
     elif plot == "pondts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="ponding", d=scen_d)
+    elif plot == "runoffts":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="runoff", d=scen_d)
     elif plot == "costcontributions" or plot == "grossmargin":
         q_irr_scen, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=scens, which="irrigation", d=scen_d, show_plot=False)
         dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=scen_d, mapper=scens, show_plot=False)

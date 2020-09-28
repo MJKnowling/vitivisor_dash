@@ -12,23 +12,23 @@
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":4.0,
+            "Value":0.0,
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Soil water irrigation trigger per phenology":{
             "Value":65.0,
-            "Description":"Maximum irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
+            "Description":"Critical percentage of extractable soil water to trigger an irrigation for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
         "Soil water irrigation defict refill percent per phenology":{
             "Value":5.0,
-            "Description":"Maximum irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
+            "Description":"The percentage of deficit to refill for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
         "Days between irrigation applications per phenology":{
-            "Value":4.0,
-            "Description":"Maximum irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
+            "Value":3.0,
+            "Description":"Days before next irrigation can occur for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"days"
         },
         "Water delivery cost":{
