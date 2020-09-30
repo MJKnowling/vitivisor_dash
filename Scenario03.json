@@ -1,5 +1,5 @@
 {
-    "Scenario03":{
+    "4 ML per ha":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -7,17 +7,17 @@
         },
         "Description":"Description of `Scenario02`",
         "Maximum irrigation mm per phenology":{
-            "Value":15.0,
+            "Value":200.0,
             "Description":"Maximum irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":0.0,
+            "Value":[4,4,4,4,3],
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Soil water irrigation trigger per phenology":{
-            "Value":65.0,
+            "Value":5.0,
             "Description":"Critical percentage of extractable soil water to trigger an irrigation for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
@@ -27,7 +27,7 @@
             "Units":"%"
         },
         "Days between irrigation applications per phenology":{
-            "Value":3.0,
+            "Value":2.0,
             "Description":"Days before next irrigation can occur for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"days"
         },
@@ -42,7 +42,7 @@
             "Units":"$ per ML"
         },
         "Water entitlement":{
-            "Value":2.0,
+            "Value":4.5,
             "Description":"Water entitlement for season (SA)",
             "Units":"ML"
         },
@@ -57,12 +57,12 @@
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":7,
+            "Value":6,
             "Description":"Number of spray applications for season",
             "Units":""
         },
         "Number of tips":{
-            "Value":2,
+            "Value":1,
             "Description":"Number of spray applications for season",
             "Units":""
         }

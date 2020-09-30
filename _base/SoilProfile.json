@@ -16,7 +16,7 @@
     "Description" : "Maximum amount of water that can be stored in ponding"
   },
   "KSMX" : {
-    "Value" : 5.0,
+    "Value" : 1.0,
     "Unit" : "cm/s",
     "Description" : "Saturated Hydraulic conductivity"
   },
@@ -32,7 +32,7 @@
       "Description" : "The depth of soil layers from surface"
     },
     "SLLL" : {
-      "Value" : [0.119,0.119,0.119,0.139,0.139,0.139,0.159,0.159,0.159,0.209,0.209,0.209,0.250,0.250,0.250],
+      "Value" : [0.119,0.119,0.119,0.129,0.129,0.129,0.139,0.139,0.139,0.159,0.159,0.159,0.169,0.169,0.169],
       "Unit" : "cm3 water /cm3 soil",
       "Description" : "Soil water lower limit"
     },
