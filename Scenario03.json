@@ -1,5 +1,5 @@
 {
-    "4 ML per ha":{
+    "2 ML per ha":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -12,12 +12,12 @@
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":[4,4,4,4,3],
+            "Value":[2,2,2,2,2],
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Soil water irrigation trigger per phenology":{
-            "Value":5.0,
+            "Value":30.0,
             "Description":"Critical percentage of extractable soil water to trigger an irrigation for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },

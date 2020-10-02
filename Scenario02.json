@@ -17,12 +17,12 @@
             "Units":"mm"
         },
         "Soil water irrigation trigger per phenology":{
-            "Value":5.0,
+            "Value":30.0,
             "Description":"Critical percentage of extractable soil water to trigger an irrigation for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
         "Soil water irrigation defict refill percent per phenology":{
-            "Value":5.0,
+            "Value":10.0,
             "Description":"The percentage of deficit to refill for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
