@@ -65,6 +65,8 @@ obs_times = 14  #every th
 #obs_dates = ["1999-01-01", "2000-09-15", "2000-12-01"]  #["2000-09-01", "2000-10-01", "2000-11-01", "2000-12-01", "2001-01-01"]
 obs_dict = {"lai": 5.0}#, "soil_water_stress": 10.0}
 
+scale_area_to_1ha = True
+
 
 def ts_plot_helper(cwd, fname="state_time_series.pdf"):
     # plot state variable time series from out csv
@@ -85,15 +87,16 @@ def mm_to_ML_irrig(mm):
     vine_rows = 18
     irrig_width = 2.5  # m  # TODO: align with zone approach in VineLOGIC
     irrig_area = block_rowwise_dist * (irrig_width * vine_rows)
-    #TODO: temp ************************************************
-    irrig_area = irrig_area * 2.2031  # scale to 1 ha
-    #TODO: temp ************************************************
+    if scale_area_to_1ha:
+        block_area = block_rowwise_dist * 51 * 0.0001  # total area ha
+        irrig_area = irrig_area * (1 / block_area)
     #irrig_area = block_rowwise_dist * 51  # total area in m2
     total_ML = mm * 0.001 * irrig_area * 0.001
     #print(mm, total_ML, mm * 0.001 * (block_rowwise_dist * 51) * 0.001)
-        #TODO: temp ************************************************
-    return total_ML, total_ML / (block_rowwise_dist * 51 * 0.0001 * 2.2031)  # tota, total per ha
-        #TODO: temp ************************************************
+    if scale_area_to_1ha:
+        return total_ML, total_ML / (block_rowwise_dist * 51 * 0.0001 * (1 / block_area))  # total, total per ha
+    else:
+        return total_ML, total_ML / (block_rowwise_dist * 51 * 0.0001)  # total, total per ha
 
 def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
     if not isinstance(cwds, list):  # dict
@@ -130,20 +133,17 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             df_all = df.loc[datetime.strftime(start_date + timedelta(365 + 365/2 - 1), '%Y-%m-%d'):
                             datetime.strftime(start_date + timedelta(365 + 365*1.5 - 1), '%Y-%m-%d'), :]
             df_all = df_all.loc[:, which]
-        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 61), '%Y-%m-%d'):
+            #print(df_all.index)
+        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 31), '%Y-%m-%d'):
                     datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
-        
-        # TODO:         
-        '''summ_df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
-        bb = summ_df.loc[:, "DOY02"][0]
-        hv = summ_df.loc[:, "DOY06"][0]
-        bb = doy_to_date(bb, (start_date + timedelta(365)).year).strftime("%d %b %Y")
-        hv = doy_to_date(hv, (start_date + timedelta(365*3)).year).strftime("%d %b %Y")
-        
-        #df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 61), '%Y-%m-%d'):
-         #           datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
-        df = df.loc[bb:hv, :]
-        '''
+
+        # or select time window of df based on phenology    
+        #summ_df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
+        #bb = summ_df.loc[:, "DOY02"][0]
+        #hv = summ_df.loc[:, "DOY06"][0]
+        #bb = doy_to_date(bb, (start_date + timedelta(365)).year).strftime("%d %b %Y")
+        #hv = doy_to_date(hv, (start_date + timedelta(365*3)).year).strftime("%d %b %Y")
+        #df = df.loc[bb:hv, :]
 
         if which == "ATheta":# or which == "soil_water":
             df_ref = df.loc[:, "IRCRITSW"]
@@ -177,7 +177,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 lai_irr_scen[scen_ws] = df
                 ax.set_ylabel("Canopy Density\n(Leaf Area Index)")
             elif which.lower() == "FruitDw".lower():
-                ax.set_ylabel("Fruit (Dry) Weight\n(per vine) (grams)")
+                ax.set_ylabel("Fruit (Dry) Weight\n (grams)")
             elif which.lower() == "Brix".lower():
                 ax.set_ylabel("Brix\n(degrees)")
             elif which == "infiltration":
@@ -209,11 +209,23 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which == "supplydemand":
                 ax.set_ylabel("Fruit Energy Demand versus Available Energy")
             elif which == "VineEop":
-                ax.set_ylabel("Potential Vine ET (cm/day)")
+                ax.set_ylabel("Potential Vine Transpiration\n(cm/day)")
             elif which == "Tru":
                 ax.set_ylabel("Root Uptake (cm/day)")
             elif which == "total_soil_water1":
                 ax.set_ylabel("Total Soil Water (cm)")
+            elif which == "BUDNOVINE":
+                ax.set_ylabel("Bud Count (Per Vine)")
+            elif which == "berry_num_shoot":
+                ax.set_ylabel("Berry Count (Per Shoot)")
+            elif which == "shoot_num":
+                ax.set_ylabel("Shoot Count (Per Vine)")
+            elif which == "Vcarbo":
+                ax.set_ylabel("Actual Carbon Assimilate (Dry\nMatter) Produced (UNITS)")
+            elif which == "Pcarb":
+                ax.set_ylabel("Potential Carbon (Dry Matter)\nProduction (UNITS)")
+            elif which == "Vreserve":
+                ax.set_ylabel("Reserve Energy Store (UNITS)")
     if which != "soil_water":
         dfs = pd.DataFrame(dfs)
     if which == "ATheta":# or which == "soil_water":
@@ -246,11 +258,11 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             if "irrigation" in which:
                 ax.text(x=xl / 2, y=max(yl) * text_height_irr[i], 
                     s="Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)".format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
-                    ha='center', va='center', fontsize=24, color=text_color[i])
+                    ha='center', va='center', fontsize=24, color=colors[int(list(dd.keys())[i][-2:]) - 1])#text_color[i])
             elif "rain" in which:
                 ax.text(x=xl / 2, y=max(yl) * text_height_rain[i], 
                     s="Rainfall Totals ({0}):\n  Seasonal (Sep-May): {1:.1f} mm\n  Annual (Jul-Jun): {2:.1f} mm".format(dd[scen_ws], rain_season_total[scen_ws], rain_annual_total[scen_ws]), 
-                    ha='center', va='center', fontsize=24, color=text_color[i])
+                    ha='center', va='center', fontsize=24, color=colors[int(list(dd.keys())[i][-2:]) - 1])#text_color[i])
             ax.axis('off')
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
@@ -263,7 +275,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 vs = {"SLLL": "wilting point", "SDUL": "field capacity", "SSAT": "saturation"}
                 zs = {0: [0, 5], 1: [7, 50], 2: [13, 200]}  # lay and depth pairs
                 for ii, ax in enumerate(axs.reshape(-1)):
-                    dfs[scen_ws][sw_states[ii]].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
+                    dfs[scen_ws][sw_states[ii]].plot(ax=ax, alpha=1.0, lw=2, color=colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
                     xlim = ax.get_xlim()
                     ax.set_ylabel("Soil Water\n Content (-)\n At Depth \n{0} cm".format(str(zs[ii][1])))
                     ax.set_ylim(0, 0.5)
@@ -283,7 +295,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                                     s="{}".format(vi[1].title()), fontsize=12, alpha=1.0, bbox=props)
                     #ax.set_xlim(xlim)
             else:
-                dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i])
+                dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
                 xlim = ax.get_xlim()
                 #print(xlim)
         if which == "soil_water":
@@ -292,7 +304,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             l = [x for x in dfs.columns]
         for i, scen_ws in enumerate(cwds):
             if which == "ATheta":# or which == "soil_water": 
-                dfs_ref[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[i], linestyle='--')
+                dfs_ref[scen_ws].plot(ax=ax, alpha=1.0, lw=2, linestyle='--', color=colors[int(list(dd.keys())[i][-2:]) - 1]) #colors[i]
         if "irrig" in which:
             ax.legend([dd[x] for x in l], loc='upper right')
         elif which != "soil_water":
@@ -308,10 +320,8 @@ def kg_per_ha_to_tonnes(kg_per_ha):
     # variables  # TODO: declare before
     # LRC block 47 area (email from Ryan Tan and accounting for drip line only around line
     block_area = 89 * 51 * 0.0001  # ha
-    #TODO: temp ************************************************
-    block_area = block_area * (1 / block_area)  # scale to 1 ha
-    #print(block_area)
-    #TODO: temp ************************************************
+    if scale_area_to_1ha:
+        block_area = block_area * (1 / block_area)
     return kg_per_ha * block_area * 0.001
 
 def yield_revenue_compare(cwds, which, d, show_plot=True):
@@ -325,9 +335,8 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
     block_rowwise_dist = 89  # m
     block_acrossrow_dist = 51  # m
     block_area = block_rowwise_dist * block_acrossrow_dist  # m**2
-    #TODO: temp ************************************************
-    block_area = block_area * (1 / block_area)  # scale to 1 ha
-    #TODO: temp ************************************************
+    if scale_area_to_1ha:
+        block_area = block_area * (1 / block_area)
     block_area_ha = block_area * 0.0001
 
     # yield bar plot
@@ -357,7 +366,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             #if i == 0:
             #if "base" not in k.lower():
              #   bl[i].set_color('#ff7f0e')
-            bl[i].set_color(colors[i])
+            bl[i].set_color(colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
             #ax.text(i, ax.get_ylim()[1] / 2, 
              #   "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=14, ha='center', alpha=0.8)
         #print([tick for tick in plt.gca().get_xticklabels()])
@@ -373,7 +382,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
         for i, k in enumerate(keys):
             #if i != 0:  #if "base" not in k.lower():
              #   bl[i].set_color('#ff7f0e')
-            bl[i].set_color(colors[i])
+            bl[i].set_color(colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
         #plt.savefig(os.path.join("plots", "yield_revenue_irrig_scen.pdf"))
@@ -423,10 +432,10 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
     for i, k in enumerate(keys):
         #if i != 0:#if "base" not in k.lower():
          #   b[i].set_color('#ff7f0e')
-        b[i].set_color(colors[i])
+        b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
     #print(d, mapper, keys)
     ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
-    plt.ylabel("Irrigation Cost ($/ha)")  #**tmp**
+    plt.ylabel("Irrigation Cost ($/ha)")
     #plt.savefig(os.path.join("plots", "cost_irrig_scen.pdf"))
     if not show_plot is True:
         plt.close()
@@ -458,9 +467,9 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
         for i, k in enumerate(keys):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')
-            b[i].set_color(colors[i])
+            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
-        plt.ylabel("Gross Margin ($)")
+        plt.ylabel("Gross Margin ($/ha)")
         #plt.savefig(os.path.join("plots", "gross_margin.pdf"))
         #plt.close()
     elif which == "cost_contribs":
@@ -480,25 +489,25 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
              #   b[i].set_color('#ff7f0e')  # assume two scens only
             #else:
              #   b[i].set_color('#1f77b4')
-            b[i].set_color(colors[i])
+            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
         b = ax.bar(range(len(c)), v[:, 1], bottom=v[:, 0], label="spray", alpha=0.3)
         for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
             #else:
              #   b[i].set_color('#1f77b4')
-            b[i].set_color(colors[i])
+            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
         b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", alpha=0.7)
         for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
             #else:
              #   b[i].set_color('#1f77b4')
-            b[i].set_color(colors[i])
+            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
         ax.legend()
         plt.xticks(range(len(c)), c)
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in c])
-        plt.ylabel("Cost Contributions ($)")
+        plt.ylabel("Cost Contributions ($/ha)")
         plt.show()
         #plt.savefig(os.path.join("plots", "cost_contribs.pdf"))
         #plt.close()
@@ -1654,15 +1663,16 @@ def water_balance_components_plot(cwds, d, plot_type):
         dates = pd.date_range(start_date, periods=daily_time_steps)
         df.index = dates
 
-        summ_df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
-        bb = summ_df.loc[:, "DOY02"][0]
-        hv = summ_df.loc[:, "DOY06"][0]
-        bb = doy_to_date(bb, (start_date + timedelta(365)).year).strftime("%d %b %Y")
-        hv = doy_to_date(hv, (start_date + timedelta(365*3)).year).strftime("%d %b %Y")
+        #summ_df = pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
+        #bb = summ_df.loc[:, "DOY02"][0]
+        #hv = summ_df.loc[:, "DOY06"][0]
+        #bb = doy_to_date(bb, (start_date + timedelta(365)).year).strftime("%d %b %Y")
+        #hv = doy_to_date(hv, (start_date + timedelta(365*3)).year).strftime("%d %b %Y")
         
-        #df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 61), '%Y-%m-%d'):
-         #           datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
-        df = df.loc[bb:hv, :]
+        # during expected season duration (with buffer)...
+        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 31), '%Y-%m-%d'):
+                    datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
+        #df = df.loc[bb:hv, :]
 
         df = df.loc[:, states]
         for mm_col in ["rain", "irrigation"]:
@@ -1670,35 +1680,47 @@ def water_balance_components_plot(cwds, d, plot_type):
             dfs[scen_ws] = df.sum()
 
     dfs = pd.DataFrame(dfs)
-    print(dfs)
 
     if plot_type == 'bar':
         fig = plt.figure(figsize=figsize)
         ax = plt.subplot(111)
         for out in ["runoff", "evap", "Tru"]:
-            print(dfs[out, :], [x for x in dfs.columns])
-            #dfs[out, [x for x in dfs.columns]].apply(lambda x: x * -1)
-        print(dfs)
+            dfs.loc[out, :] = dfs.loc[out, :].apply(lambda x: x * -1)
 
         x = np.arange(len(dfs[scen_ws].index))
-        print(x)
         w = 0.25
 
-        for i, col in enumerate(dfs.columns):
-            print(i, col)
-            b = ax.bar(x[i], s.values, w, label=col)
+        for i, col in enumerate(dfs.columns):  # over scens
+            o = (i - len(dfs.columns) / 2) * w + w / 2
+            b = ax.bar(x + o, dfs[col].values, w, label=cwds[col], color=colors[int(list(cwds.keys())[i][-2:]) - 1]);
+        ax.axhline(y=0.0, linewidth=2, color='k', alpha=1.0)
+        ax.set_ylabel('Sum of Water Balance\n Components Over Growing Season (cm)')
+        ax.set_xticks(x)
+        ax.set_xticklabels([x.title() for x in dfs[scen_ws].index])
+        ax.legend()
+        plt.tight_layout()
 
     elif plot_type == 'pie':
-        fig, axs = plt.subplots(nrows=1, ncols=3, figsize=figsize)
+        fig, axs = plt.subplots(nrows=1, ncols=len(dfs.columns), figsize=figsize)
         axs = np.array(axs)
-        print(dfs)
-        dfs.apply(lambda x: x / dfs.sum())
-        #for i, col in enumerate(dfs.columns):
-        for i, ax in enumarate(axs.reshape(-1)):
-            p = ax.pie(s, labels=s.index, autopct='%1.1f%%', startangle=90)
-            ax.axis('equal')
+        #dfs = dfs.apply(lambda x: x / x.sum(), axis=0)  # done automatically with pie
+        
+        avg_r = dfs.abs().sum().mean()
+        print(avg_r)
+        for i, ax in enumerate(axs.reshape(-1)):
+            ax.set_title(cwds[dfs.columns[i]], fontsize=15)
+            r = dfs[dfs.columns[i]].abs().sum() / avg_r
+            print(sqrt(r))
+            p = ax.pie(dfs[dfs.columns[i]], startangle=0, autopct='%1.1f%%', labels=[x.title() for x in dfs.index]) #radius=1*r,  
+            #ax.axis('equal')
+        #fig.legend(p[0], labels=dfs.index, bbox_to_anchor=(1.05, 1), loc='right')
+        fig.suptitle("Relative Water Balance\nComponents (cm) Over\nGrowing Season", fontsize=20)
+        fig.tight_layout()
+        #_fig, _ax = fig.copy(), ax.copy()
+        #plt.close()
+
     
-    return fig, ax
+    return fig, ax #_fig, _ax
 
 
 def plot_scen(scens, plot, scen_d):
@@ -1723,6 +1745,14 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="fruit", d=scen_d)
     elif plot == "brixtimeseries":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Brix", d=scen_d)
+    elif plot == "berrynumshoottimeseries":
+        q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="berry_num_shoot", d=scen_d)
+    elif plot == "berrynumvinetimeseries":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="berry_num_vine", d=scen_d)
+    elif plot == "shootnumtimeseries":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="shoot_num", d=scen_d)
+    elif plot == "budnovinetimeseries":
+        q_irr_scen, lai_irr_scen, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="BUDNOVINE", d=scen_d)
 
     elif plot == "fruitsinkts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="FruitSink", d=scen_d)
@@ -1736,6 +1766,12 @@ def plot_scen(scens, plot, scen_d):
          _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="VineEop", d=scen_d)
     elif plot == "Tru":
          _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Tru", d=scen_d)
+    elif plot == "vcarbots":
+         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Vcarbo", d=scen_d)
+    elif plot == "vreservets":
+         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Vreserve", d=scen_d)
+    elif plot == "pcarbts":
+         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Pcarb", d=scen_d)
 
     elif plot == "infiltrationts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="infiltration", d=scen_d)
@@ -1795,6 +1831,7 @@ def plot_scen(scens, plot, scen_d):
         ax.text(0.5, 0.5, "UNDER CONSTRUCTION", color="red", ha='center', va='center', fontsize=24)
         #plt.close()
 
+
     return fig, ax
 
 def plot_phenol_keydate(cwds, which, d):
@@ -1821,7 +1858,7 @@ def plot_phenol_keydate(cwds, which, d):
             plot = "harvest"
             kd = df.loc[:, "DOY06"][0]
         ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), dd[scen_ws].split("_")[-1], doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b %Y")), 
-                ha='center', va='center', fontsize=24, color=text_color[i])
+                ha='center', va='center', fontsize=24, color=colors[int(list(dd.keys())[i][-2:]) - 1])#text_color[i])
         ax.axis('off')
     return fig, ax
 
