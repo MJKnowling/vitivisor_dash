@@ -51,6 +51,11 @@
             "Description":"Water allocation multiplier factor; this value is defined annually for SA",
             "Units":""
         },
+        "Private diversion factor":{
+            "Value":0.0,
+            "Description":"Proportion of patch that is fed via private diversions (i.e., where electricity is only irrigation cost). A value of 0.0 means that all water is delivered via CIT (see above); a value of 1.0 means that all water is pumped directly.",
+            "Units":""
+        },
         "Cost per spray":{
             "Value":1000.0,
             "Description":"Cost of average spray pass, including chemical, labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
