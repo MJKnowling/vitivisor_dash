@@ -416,10 +416,10 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
     dolla_irr_scen = q_irr_scen.copy()
 
     #print(dolla_irr_scen)
-    #print(d)
+    print({x: d[mapper[x]]['allocation_factor'] for x, a in dolla_irr_scen.items()})
 
-    dolla_irr_scen = {x: (a * d[mapper[x]]['water_delivery_rate'] if dolla_irr_scen[x] <= d[mapper[x]]['water_entitlement']
-                          else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - d[mapper[x]]['water_entitlement']) * d[mapper[x]]['water_market_rate']))
+    dolla_irr_scen = {x: (a * d[mapper[x]]['water_delivery_rate'] if dolla_irr_scen[x] <= (d[mapper[x]]['water_entitlement'] * d[mapper[x]]['allocation_factor'])
+                          else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - (d[mapper[x]]['water_entitlement'] * d[mapper[x]]['allocation_factor'])) * d[mapper[x]]['water_market_rate']))
                           for x, a in dolla_irr_scen.items()
                           }
     #print(dolla_irr_scen)

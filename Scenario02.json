@@ -43,8 +43,13 @@
         },
         "Water entitlement":{
             "Value":4.5,
-            "Description":"Water entitlement for season (SA)",
+            "Description":"Water entitlement for season",
             "Units":"ML"
+        },
+        "Water allocation factor":{
+            "Value":1.0,
+            "Description":"Water allocation multiplier factor; this value is defined annually for SA",
+            "Units":""
         },
         "Cost per spray":{
             "Value":1000.0,
@@ -53,17 +58,17 @@
         },
         "Cost per tip":{
             "Value":150.0,
-            "Description":"Cost of average spray pass, including labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
+            "Description":"Cost of average tip pass, including labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":7,
+            "Value":10,
             "Description":"Number of spray applications for season",
             "Units":""
         },
         "Number of tips":{
-            "Value":1,
-            "Description":"Number of spray applications for season",
+            "Value":2,
+            "Description":"Number of tips for season",
             "Units":""
         }
     }
