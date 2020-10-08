@@ -193,7 +193,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which == "ATheta":
                 ax.set_ylabel("Irrigation Trigger-Relevant\nSoil Water\n")#(= $\Sigma^{nlayr_irri_depthj}_{1}$ (Sw - Wilting Point) * dz / Sigma^{nlayr}_{1}$ (Field Capacity - Wilting Point) * dz")
             elif which == "soil_water_balance":
-                ax.set_ylabel("Water Balance Error (cm)")#\n(sum(total soil water, Rain, Irrig, Pond)) - (sum(TSW2, pond, runoff, drain, ES, TRU))")
+                ax.set_ylabel("Water Balance Error (cm)\n(sum(total soil water, Rain,\nIrrig, Pond)) - (sum(total soil water,\nPond, Runoff, Drain, Surface Evaporation, Root Uptake))")
 
             elif which == "ponding":
                 ax.set_ylabel("Ponding (cm)")
@@ -1658,7 +1658,7 @@ def run_scen(ws):
     #return fig, ax
 
 def water_balance_components_plot(cwds, d, plot_type):
-    states = ["rain", "irrigation", "runoff", "evap", "Tru"]
+    states = ["rain", "irrigation", "runoff", "evap", "Tru", "drainage"]
     dfs = {}
     for i, scen_ws in enumerate(cwds):
         df = pd.read_csv(os.path.join(scen_ws, vines_out_fname),
@@ -1683,11 +1683,12 @@ def water_balance_components_plot(cwds, d, plot_type):
             dfs[scen_ws] = df.sum()
 
     dfs = pd.DataFrame(dfs)
+    #print(dfs.index)
 
     if plot_type == 'bar':
         fig = plt.figure(figsize=figsize)
         ax = plt.subplot(111)
-        for out in ["runoff", "evap", "Tru"]:
+        for out in ["runoff", "evap", "Tru", "drainage"]:
             dfs.loc[out, :] = dfs.loc[out, :].apply(lambda x: x * -1)
 
         x = np.arange(len(dfs[scen_ws].index))
