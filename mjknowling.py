@@ -257,13 +257,19 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         for i, scen_ws in enumerate(cwds):
             if "irrigation" in which:
                 ax.text(x=xl / 2, y=max(yl) * text_height_irr[i], 
-                    s="Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)".format(dd[scen_ws], q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
+                    s="Seasonal Irrigation Total ({0}):\n {1:.1f} mm ({2:.1f} ML/ha)".format(dd[scen_ws].replace("\n"," "), q_mm_total[scen_ws], q_irr_per_ha_scen[scen_ws]), 
                     ha='center', va='center', fontsize=24, color=colors[int(list(dd.keys())[i][-2:]) - 1])#text_color[i])
+                    
             elif "rain" in which:
                 ax.text(x=xl / 2, y=max(yl) * text_height_rain[i], 
-                    s="Rainfall Totals ({0}):\n  Seasonal (Sep-May): {1:.1f} mm\n  Annual (Jul-Jun): {2:.1f} mm".format(dd[scen_ws], rain_season_total[scen_ws], rain_annual_total[scen_ws]), 
+                    s="Rainfall Totals ({0}):\n  Seasonal (Sep-May): {1:.1f} mm\n  Annual (Jul-Jun): {2:.1f} mm".format(dd[scen_ws].replace("\n"," "), rain_season_total[scen_ws], rain_annual_total[scen_ws]), 
                     ha='center', va='center', fontsize=24, color=colors[int(list(dd.keys())[i][-2:]) - 1])#text_color[i])
             ax.axis('off')
+
+        # financial benchmarking
+        if "irrigation" in which:
+            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Case study average: 8.43 ML/ha", 
+                ha='center', va='center', fontsize=24, color='k')
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
         for i, scen_ws in enumerate(cwds):
@@ -316,6 +322,10 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
 
     return q_irr_scen, lai_irr_scen, (fig, ax)
 
+def financial_benchmarking_data():
+    #df = pd.read_xls()
+    pass
+
 def kg_per_ha_to_tonnes(kg_per_ha):
     # variables  # TODO: declare before
     # LRC block 47 area (email from Ryan Tan and accounting for drip line only around line
@@ -361,12 +371,23 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
         values = yields.values()
         # TODO: bar only if num_scen > 1!
         bl = ax.bar(keys, values)
+        xlim = ax.get_xlim()
         for i, k in enumerate(keys):
             #print(k)
             #if i == 0:
             #if "base" not in k.lower():
              #   bl[i].set_color('#ff7f0e')
             bl[i].set_color(colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
+
+            # financial benchmarking  # TODO
+            avg_red_yield_per_ha, avg_white_yield_per_ha = 22.27, 28.70
+            props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
+            _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
+            ax.axhline(y=avg_red_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
+            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="Red variety average", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            #ax.axhline(y=avg_white_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
+            #ax.text(x=_x, y=avg_white_yield_per_ha - (0.02 * avg_red_yield_per_ha), va='top', ha='center', s="White variety average", fontsize=12, alpha=1.0, bbox=props)
+
             #ax.text(i, ax.get_ylim()[1] / 2, 
              #   "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=14, ha='center', alpha=0.8)
         #print([tick for tick in plt.gca().get_xticklabels()])
@@ -379,10 +400,18 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
         keys = yield_rev.keys()
         values = yield_rev.values()
         bl = ax.bar(keys, values)
+        xlim = ax.get_xlim()
         for i, k in enumerate(keys):
             #if i != 0:  #if "base" not in k.lower():
              #   bl[i].set_color('#ff7f0e')
             bl[i].set_color(colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
+
+            # financial benchmarking  # TODO
+            avg_revenue_per_ha = 14007
+            props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
+            _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
+            ax.axhline(y=avg_revenue_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
+            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Case study average", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
         #plt.savefig(os.path.join("plots", "yield_revenue_irrig_scen.pdf"))
@@ -467,10 +496,19 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
         keys = gross_margin.keys()
         values = gross_margin.values()
         b = ax.bar(keys, values)
+        xlim = ax.get_xlim()
         for i, k in enumerate(keys):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')
             b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
+
+            # financial benchmarking
+            avg_gross_margin_per_ha = 7303
+            props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
+            _x = xlim[1] - (0.3 * (xlim[1] - xlim[0]))
+            ax.axhline(y=avg_gross_margin_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
+            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="Case study average", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
         plt.ylabel("Gross Margin ($/ha)")
         #plt.savefig(os.path.join("plots", "gross_margin.pdf"))
@@ -1861,7 +1899,7 @@ def plot_phenol_keydate(cwds, which, d):
         elif "hv" in which:
             plot = "harvest"
             kd = df.loc[:, "DOY06"][0]
-        ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), dd[scen_ws].split("_")[-1], doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b %Y")), 
+        ax.text(0.5, text_height[i], "Date of {0} ({1}):\n {2}".format(plot.title(), dd[scen_ws].split("_")[-1].replace("\n"," "), doy_to_date(kd, (start_date + timedelta(365)).year).strftime("%d %b %Y")), 
                 ha='center', va='center', fontsize=24, color=colors[int(list(dd.keys())[i][-2:]) - 1])#text_color[i])
         ax.axis('off')
     return fig, ax
