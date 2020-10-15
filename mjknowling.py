@@ -268,8 +268,9 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
 
         # financial benchmarking
         if "irrigation" in which:
-            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Case study average: 8.43 ML/ha", 
+            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Case study average*: 8.43 ML/ha", 
                 ha='center', va='center', fontsize=24, color='k')
+            plt.annotate('Note: Average irrigation data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
         for i, scen_ws in enumerate(cwds):
@@ -307,14 +308,27 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         if which == "soil_water":
             l = [x for x in dfs.keys()]
         else:
-            l = [x for x in dfs.columns]
+            if "LAI" in which:
+                #lai_obs = pd.read_csv()
+                lai_obs = pd.DataFrame([[1.0],[1.5]], index=["2020-10-01","2020-10-15"], columns=["observed PAI"])
+                lai_obs.loc[:, "Date"] = lai_obs.index
+                lai_obs.loc[:, "Date"] = lai_obs.Date.apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
+                lai_obs.set_index("Date", inplace=True)
+                lai_obs.plot(style='o', ax=ax, color='k')
+            else:
+                l = [x for x in dfs.columns]
         for i, scen_ws in enumerate(cwds):
             if which == "ATheta":# or which == "soil_water": 
                 dfs_ref[scen_ws].plot(ax=ax, alpha=1.0, lw=2, linestyle='--', color=colors[int(list(dd.keys())[i][-2:]) - 1]) #colors[i]
         if "irrig" in which:
             ax.legend([dd[x] for x in l], loc='upper right')
         elif which != "soil_water":
-            ax.legend([dd[x] for x in l])
+            if which == "LAI":
+                l = [dd[x] for x in dfs.columns]
+                l = l + list(lai_obs.columns)
+                ax.legend(l)
+            else:
+                ax.legend([dd[x] for x in l])
             ax.set_xlabel("Date")
     #plt.savefig(os.path.join("plots", "ts_{}.pdf".format(which)))
     if not show_plot is True:
@@ -384,15 +398,16 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
             _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_red_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
-            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="Red variety average", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="Red variety average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
             #ax.axhline(y=avg_white_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
-            #ax.text(x=_x, y=avg_white_yield_per_ha - (0.02 * avg_red_yield_per_ha), va='top', ha='center', s="White variety average", fontsize=12, alpha=1.0, bbox=props)
+            #ax.text(x=_x, y=avg_white_yield_per_ha - (0.02 * avg_red_yield_per_ha), va='top', ha='center', s="White variety average*", fontsize=12, alpha=1.0, bbox=props)
 
             #ax.text(i, ax.get_ylim()[1] / 2, 
              #   "Tonnes per ha:\n {0:.2f}".format(yields[k] / block_area_ha), size=14, ha='center', alpha=0.8)
         #print([tick for tick in plt.gca().get_xticklabels()])
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Yield (Tonnes/ha)")  #**tmp**
+        plt.annotate('Note: Average yield data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
@@ -411,9 +426,10 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
             _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_revenue_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
-            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Case study average", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
+        plt.annotate('Note: Average harvest revenue data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
         #plt.savefig(os.path.join("plots", "yield_revenue_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
@@ -505,12 +521,13 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
             # financial benchmarking
             avg_gross_margin_per_ha = 7303
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
-            _x = xlim[1] - (0.3 * (xlim[1] - xlim[0]))
+            _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_gross_margin_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
-            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="Case study average", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="Case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
 
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
         plt.ylabel("Gross Margin ($/ha)")
+        plt.annotate('Note: Average gross margin data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
         #plt.savefig(os.path.join("plots", "gross_margin.pdf"))
         #plt.close()
     elif which == "cost_contribs":
