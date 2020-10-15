@@ -1,5 +1,5 @@
 {
-    "4.5 ML per ha":{
+    "4.5 ML/ha,\nShiraz,\nSchwarzmann":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -74,6 +74,16 @@
         "Number of tips":{
             "Value":2,
             "Description":"Number of tips for season",
+            "Units":""
+        },
+        "Rootstock":{
+            "Value":"Schwarzmann",
+            "Description":"Type of rootstock (options: Own Roots, Ramsey, Schwarzmann)",
+            "Units":""
+        },
+        "Variety":{
+            "Value":"Shiraz",
+            "Description":"Grape variety (options: Shiraz, Chardonnay, Cabernet Sauvignon, Colombard)",
             "Units":""
         }
     }

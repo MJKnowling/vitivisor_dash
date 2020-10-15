@@ -310,11 +310,11 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         else:
             if "LAI" in which:
                 #lai_obs = pd.read_csv()
-                lai_obs = pd.DataFrame([[1.0],[1.5]], index=["2020-10-01","2020-10-15"], columns=["observed PAI"])
+                lai_obs = pd.DataFrame([[1.0],[1.4]], index=["2020-10-05","2020-10-20"], columns=["observed PAI"])
                 lai_obs.loc[:, "Date"] = lai_obs.index
                 lai_obs.loc[:, "Date"] = lai_obs.Date.apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
                 lai_obs.set_index("Date", inplace=True)
-                lai_obs.plot(style='o', ax=ax, color='k')
+                lai_obs.plot(ax=ax, style='o', markerfacecolor='black')
             else:
                 l = [x for x in dfs.columns]
         for i, scen_ws in enumerate(cwds):

@@ -1,5 +1,5 @@
 {
-    "2 ML per ha":{
+    "4.5 ML/ha,\nShiraz,\nOwn Roots":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -12,7 +12,7 @@
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":[2,2,2,2,2],
+            "Value":[4,5,5,4,4],
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
@@ -22,7 +22,7 @@
             "Units":"%"
         },
         "Soil water irrigation defict refill percent per phenology":{
-            "Value":5.0,
+            "Value":10.0,
             "Description":"The percentage of deficit to refill for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
@@ -67,13 +67,23 @@
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":8,
+            "Value":10,
             "Description":"Number of spray applications for season",
             "Units":""
         },
         "Number of tips":{
             "Value":2,
             "Description":"Number of tips for season",
+            "Units":""
+        },
+        "Rootstock":{
+            "Value":"Own Roots",
+            "Description":"Type of rootstock (options: Own Roots, Ramsey, Schwarzmann)",
+            "Units":""
+        },
+        "Variety":{
+            "Value":"Shiraz",
+            "Description":"Grape variety (options: Shiraz, Chardonnay, Cabernet Sauvignon, Colombard)",
             "Units":""
         }
     }

@@ -1,5 +1,5 @@
 {
-    "6 ML per ha":{
+    "2 ML/ha,\nShiraz,\nSchwarzmann":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -7,12 +7,12 @@
         },
         "Description":"Description of `Scenario02`",
         "Maximum irrigation mm per phenology":{
-            "Value":500.0,
+            "Value":200.0,
             "Description":"Maximum irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":7.1,
+            "Value":[2,2,2,2,2],
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
@@ -22,7 +22,7 @@
             "Units":"%"
         },
         "Soil water irrigation defict refill percent per phenology":{
-            "Value":10.0,
+            "Value":5.0,
             "Description":"The percentage of deficit to refill for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
@@ -67,13 +67,18 @@
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":12,
+            "Value":8,
             "Description":"Number of spray applications for season",
             "Units":""
         },
         "Number of tips":{
             "Value":2,
             "Description":"Number of tips for season",
+            "Units":""
+        },
+        "Rootstock":{
+            "Value":"Schwarzmann",
+            "Description":"Type of rootstock (options: Own Roots, Ramsey, Schwarzmann)",
             "Units":""
         }
     }
