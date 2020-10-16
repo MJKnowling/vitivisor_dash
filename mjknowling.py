@@ -270,7 +270,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         if "irrigation" in which:
             ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Case study average*: 8.43 ML/ha", 
                 ha='center', va='center', fontsize=24, color='k')
-            plt.annotate('Note: Average irrigation data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
+            #plt.annotate('Note: Average irrigation data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
         for i, scen_ws in enumerate(cwds):
@@ -429,7 +429,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
         #print([tick for tick in plt.gca().get_xticklabels()])
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Yield (Tonnes/ha)")  #**tmp**
-        plt.annotate('Note: Average yield data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
+        #plt.annotate('Note: Average yield data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
         #plt.savefig(os.path.join("plots", "yield_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
@@ -451,7 +451,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
-        plt.annotate('Note: Average harvest revenue data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
+        #plt.annotate('Note: Average harvest revenue data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
         #plt.savefig(os.path.join("plots", "yield_revenue_irrig_scen.pdf"))
         if not show_plot is True:
             plt.close()
@@ -549,7 +549,7 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
 
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
         plt.ylabel("Gross Margin ($/ha)")
-        plt.annotate('Note: Average gross margin data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
+        #plt.annotate('Note: Average gross margin data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
         #plt.savefig(os.path.join("plots", "gross_margin.pdf"))
         #plt.close()
     elif which == "cost_contribs":
