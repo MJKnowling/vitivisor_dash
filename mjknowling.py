@@ -310,11 +310,11 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         else:
             if "LAI" in which:
                 #lai_obs = pd.read_csv()
-                lai_obs = pd.DataFrame([[1.0],[1.4]], index=["2020-10-05","2020-10-20"], columns=["observed PAI"])
+                lai_obs = process_pai_obs()  #dummy: pd.DataFrame([[1.0],[1.4]], index=["2020-10-05","2020-10-20"], columns=["observed PAI"])
                 lai_obs.loc[:, "Date"] = lai_obs.index
                 lai_obs.loc[:, "Date"] = lai_obs.Date.apply(lambda x: datetime.strptime(x, '%Y-%m-%d'))
                 lai_obs.set_index("Date", inplace=True)
-                lai_obs.plot(ax=ax, style='o', markerfacecolor='black')
+                lai_obs.plot(ax=ax, style='o', markerfacecolor='black', markeredgecolor='black', label="effective LAI")
             else:
                 l = [x for x in dfs.columns]
         for i, scen_ws in enumerate(cwds):
@@ -335,6 +335,28 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         plt.close()
 
     return q_irr_scen, lai_irr_scen, (fig, ax)
+
+def process_pai_obs():
+    fs = [x for x in os.listdir(os.path.join("_data","pai"))]
+    dfs = pd.DataFrame()
+    for f in fs:        
+        # just scrape what (I think) is needed...
+        if f.endswith(".csv"):
+            mean_effective_lai = pd.read_csv(os.path.join("_data","pai",f), index_col=0).loc[:, "LAIe"].mean()
+        elif ".xls" in f:
+            mean_effective_lai = pd.read_excel(os.path.join("_data","pai","LRC_47_SHZ_PAI_2020_09_16.xls"), index_col=0).loc[:, "LAIe"].mean()
+        else:
+            raise Exception("Interpretted PAI output file type not recognized...")
+
+        d = f.split(".")[0][-10:].replace("_","-")
+        date = datetime.strptime(d, '%Y-%m-%d')
+        df = pd.DataFrame([mean_effective_lai], index=[d], columns=["LAIe"])
+        dfs = pd.concat((dfs, df))
+    
+    #print(dfs)
+    # date = datetime.strptime(d, '%Y-%m-%d')
+    
+    return dfs
 
 def financial_benchmarking_data():
     #df = pd.read_xls()

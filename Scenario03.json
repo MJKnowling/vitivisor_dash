@@ -1,5 +1,5 @@
 {
-    "4.5 ML/ha,\nShiraz,\nOwn Roots":{
+    "2 ML/ha,\nShiraz,\nSchwarzmann":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -12,7 +12,7 @@
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":[4,5,5,4,4],
+            "Value":[2,2,2,2,2],
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
@@ -22,7 +22,7 @@
             "Units":"%"
         },
         "Soil water irrigation defict refill percent per phenology":{
-            "Value":10.0,
+            "Value":5.0,
             "Description":"The percentage of deficit to refill for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
@@ -42,7 +42,7 @@
             "Units":"$ per ML"
         },
         "Water entitlement":{
-            "Value":4.5,
+            "Value":2.5,
             "Description":"Water entitlement for season",
             "Units":"ML"
         },
@@ -67,7 +67,7 @@
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":10,
+            "Value":8,
             "Description":"Number of spray applications for season",
             "Units":""
         },
@@ -77,13 +77,13 @@
             "Units":""
         },
         "Rootstock":{
-            "Value":"Own Roots",
-            "Description":"Type of rootstock (options: Own Roots, Ramsey, Schwarzmann)",
+            "Value":"Schwarzmann",
+            "Description":"Type of rootstock (currently supported options include: Own Roots, Ramsey, Schwarzmann)",
             "Units":""
         },
         "Variety":{
             "Value":"Shiraz",
-            "Description":"Grape variety (options: Shiraz, Chardonnay, Cabernet Sauvignon, Colombard)",
+            "Description":"Grape variety (currently supported options include: Shiraz, Chardonnay, Cabernet Sauvignon, Colombard)",
             "Units":""
         }
     }
