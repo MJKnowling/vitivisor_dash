@@ -344,7 +344,7 @@ def process_pai_obs():
         if f.endswith(".csv"):
             mean_effective_lai = pd.read_csv(os.path.join("_data","pai",f), index_col=0).loc[:, "LAIe"].mean()
         elif ".xls" in f:
-            mean_effective_lai = pd.read_excel(os.path.join("_data","pai","LRC_47_SHZ_PAI_2020_09_16.xls"), index_col=0).loc[:, "LAIe"].mean()
+            mean_effective_lai = 0.20  #pd.read_excel(os.path.join("_data","pai","LRC_47_SHZ_PAI_2020_09_16.xls"), index_col=0).loc[:, "LAIe"].mean()
         else:
             raise Exception("Interpretted PAI output file type not recognized...")
 
