@@ -85,7 +85,9 @@ def mm_to_ML_irrig(mm):
     # LRC block 47 area (email from Ryan Tan and accounting for drip line only around line
     block_rowwise_dist = 89  # m
     vine_rows = 18
-    irrig_width = 2.5  # m  # TODO: align with zone approach in VineLOGIC
+    irrig_width = 2.9  # m  # drip irrigation; While this seems too large conceptually (at least it does to me), 
+    #this is what gives agreement with reported Riverland irrigation ML values. E.g., Brian Caddy’s dripper irrigation data, a 3.86 ha block receiving 504 mm 
+    #(average irrigation during on irrigation days = 4 h; 1.05 mm/h dipper rate) corresponding to 19.45 ML, i.e., 5.05 ML/ha (100 mm ~= 1 ML). 
     irrig_area = block_rowwise_dist * (irrig_width * vine_rows)
     if scale_area_to_1ha:
         block_area = block_rowwise_dist * 51 * 0.0001  # total area ha
@@ -106,8 +108,6 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         which = "LAI"
     elif which == "fruit":
         which = "FruitDw"
-    elif which == "supplydemand":
-        which = ["FruitSink", "Cpool"]
     if which == "soil_water":
         fig, axs = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=figsize)
         axs = np.array(axs)
@@ -148,16 +148,21 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         if which == "ATheta":# or which == "soil_water":
             df_ref = df.loc[:, "IRCRITSW"]
             dfs_ref[scen_ws] = df_ref
-        if which == "soil_water":
+        elif which == "soil_water":
             sw_states = ["soil_water_top", "soil_water_mid", "soil_water_bot"]
             df = df.loc[:, sw_states]
+        elif which == "supply_demand":
+            states = ["FruitSink", "Cpool"]
+            df = df.loc[:, states]
         else:
             yl.append(ax.get_ylim()[1])
             xl = ax.get_xlim()[1]
             df = df.loc[:, which]
         dfs[scen_ws] = df
+
         if which == "rain" and total is True:
             dfs_all[scen_ws] = df_all
+
         if "irrigation" in which:
             q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
             #print(df.loc[df.values>0.0])
@@ -172,7 +177,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 rain_season_total[scen_ws] = df.sum()  # seasonal
                 rain_annual_total[scen_ws] = df_all.sum()  # annual - take hydrological year
             ax.set_ylabel("Rainfall (mm/day)")
-        elif which != "soil_water":
+        elif which != "soil_water" and which != "supply_demand":
             if which.lower() == "LAI".lower():
                 lai_irr_scen[scen_ws] = df
                 ax.set_ylabel("Canopy Density\n(Leaf Area Index)")
@@ -226,7 +231,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 ax.set_ylabel("Potential Carbon (Dry Matter)\nProduction (UNITS)")
             elif which == "Vreserve":
                 ax.set_ylabel("Reserve Energy Store (UNITS)")
-    if which != "soil_water":
+    if which != "soil_water" and which != "supply_demand":
         dfs = pd.DataFrame(dfs)
     if which == "ATheta":# or which == "soil_water":
         dfs_ref = pd.DataFrame(dfs_ref)
@@ -239,7 +244,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
         #r1 = ax.bar(ind + width / 2, dfs["irrig_base"], width, label="Base", color='#1f77b4')
         #r2 = ax.bar(ind + width / 2, dfs["irrig_low"], width, label="Low", color='#ff7f0e')
         #ax.set_ylabel('Scores')
-        #ax.set_title('Scores by group and gender')
+        #ax.set_title]('Scores by group and gender')
         #ax.set_xticks(ind)
         #ax.set_xticklabels(('G1', 'G2', 'G3', 'G4', 'G5'))
         #ax.legend()
@@ -274,9 +279,11 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
     else:
         #dfs.plot(ax=ax, alpha=1.0, lw=2)
         for i, scen_ws in enumerate(cwds):
-            if which == "supplydemand":
-                # TODO
-                pass
+            if which == "supply_demand":
+                fmt = ['-', '--']
+                for ii, k in enumerate(dfs.keys()):
+                    dfs[k].plot(ax=ax, legend=False, color=colors[i], linestyle=fmt[ii])
+                #ax.set_ylabel("Energy supply v demand")
             elif which == "soil_water":
                 sp = pd.read_json(os.path.join("_base", "SoilProfile.json"))
                 vs = {"SLLL": "wilting point", "SDUL": "field capacity", "SSAT": "saturation"}
@@ -307,6 +314,8 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 #print(xlim)
         if which == "soil_water":
             l = [x for x in dfs.keys()]
+        elif which == "supply_demand":
+            pass
         else:
             if "LAI" in which:
                 #lai_obs = pd.read_csv()
@@ -322,7 +331,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 dfs_ref[scen_ws].plot(ax=ax, alpha=1.0, lw=2, linestyle='--', color=colors[int(list(dd.keys())[i][-2:]) - 1]) #colors[i]
         if "irrig" in which:
             ax.legend([dd[x] for x in l], loc='upper right')
-        elif which != "soil_water":
+        elif which != "soil_water" and which != "supply_demand":
             if which == "LAI":
                 l = [dd[x] for x in dfs.columns]
                 l = l + list(lai_obs.columns)
@@ -370,14 +379,38 @@ def kg_per_ha_to_tonnes(kg_per_ha):
         block_area = block_area * (1 / block_area)
     return kg_per_ha * block_area * 0.001
 
-def invest_irrig_vol_to_yield_relationship():
+def fruit_supply_demand_ts_plot(ws):
+    ws = os.path.join(ws)
+    df = pd.read_csv(os.path.join(ws, vines_out_fname), index_col="DayOfYear")
+    vars_of_interest = ["FruitSink", "Cpool"]
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    df.loc[:, vars_of_interest].plot(ax=ax)
+    #ax.set_ylabel("Energy supply v demand")
+    plt.savefig("fruit_supply_demand.pdf")
+    #plt.close()
+
+def invest_irrig_vol_to_yield_relationship(ws):
     dfs = pd.DataFrame()
-    ws = os.path.join("irrig_yield_sens_tests")
+    ws = os.path.join(ws)
     var = "IRDAYSTAGECAP"
     # irrigation allowed every day
     scens = list(np.arange(0,25,0.5))  # daily irrig mm max
+    rain = "org"  # "low"
     for scen in scens:
         apply_irrig_vars(ws=ws, var=var, replace_val=scen)  # this writes json
+        
+        # other relevant variables in invest
+        # rain
+        #if rain == "low":  # rain multiplied by 0.75
+         #   if os.path.exists(os.path.join(ws, "MILD.csv")):
+          #      os.remove(os.path.join(ws, "MILD.csv"))
+           # shutil.copy2(os.path.join(ws, "MILD_low.csv"), os.path.join(ws, "MILD.csv"))
+        #else:
+         #   if os.path.exists(os.path.join(ws, "MILD.csv")):
+          #      os.remove(os.path.join(ws, "MILD.csv"))
+           # shutil.copy2(os.path.join(ws, "MILD_org.csv"), os.path.join(ws, "MILD.csv"))
+
         run_scen(ws=ws)
         # get irrig vol 
         df = pd.read_csv(os.path.join(ws, vines_out_fname), index_col="DayOfYear")
@@ -401,7 +434,8 @@ def invest_irrig_vol_to_yield_relationship():
     plt.ylabel("Yield (tonnes/ha)")
     plt.xlabel("Irrigation (ML/ha)")
     #plt.annotate('?', (10 ,10), (0, 9), xycoords='axes fraction', textcoords='offset points', va='top')
-
+    plt.tight_layout()
+    plt.savefig("dy_dq.pdf")
 
 def apply_irrig_vars(ws, var, replace_val):
     if var != "Irrigation":
@@ -1890,8 +1924,8 @@ def plot_scen(scens, plot, scen_d):
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="Cpool", d=scen_d)
     elif plot == "swstressts":
         _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="soil_water_stress1", d=scen_d)
-    #elif plot == "supplydemand":
-     #   _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="supply_demand", d=scen_d)
+    elif plot == "supplydemand":
+        _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="supply_demand", d=scen_d)
     elif plot == "VineEop":
          _, _, (fig, ax) = ts_compare_irrig_plot(cwds=scens, which="VineEop", d=scen_d)
     elif plot == "Tru":
