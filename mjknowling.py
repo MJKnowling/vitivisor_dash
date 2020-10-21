@@ -370,12 +370,60 @@ def kg_per_ha_to_tonnes(kg_per_ha):
         block_area = block_area * (1 / block_area)
     return kg_per_ha * block_area * 0.001
 
+def invest_irrig_vol_to_yield_relationship():
+    dfs = pd.DataFrame()
+    ws = os.path.join("Scenario01")
+    var = "IRDAYSTAGECAP"
+    scens = list(np.arange(0,10,0.25))  # daily irrig mm max
+    for scen in scens:
+        apply_irrig_vars(ws=ws, var=var, replace_val=scen)  # this writes json
+        run_scen(ws=ws)
+        # get irrig vol 
+        df = pd.read_csv(os.path.join(ws, vines_out_fname), index_col="DayOfYear")
+        dates = pd.date_range(start_date, periods=daily_time_steps)
+        df.index = dates
+        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 31), '%Y-%m-%d'):
+                    datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
+        df = df.loc[:, "irrigation"]
+        q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
+        # get yield
+        y = kg_per_ha_to_tonnes(pd.read_csv(os.path.join(ws, vines_summ_fname)).loc[:, "Yield"][0])
+        df = pd.DataFrame([y], index=[q_per_ha], columns=["yield"])
+        dfs = pd.concat((dfs, df))
+    fig, ax = plt.subplots()
+    dfs.plot(ax=ax, legend=False, style='o-')
+    #xl = ax.get_xlim()
+    #x = np.array(xl)
+    #zaddow_expt_knowl = 3.0
+    #y = 10.0 + zaddow_expt_knowl * x
+    plt.plot(x, y, '--')
+    plt.ylabel("Yield (tonnes/ha)")
+    plt.xlabel("Irrigation (ML/ha)")
+    #plt.annotate('?', (10 ,10), (0, 9), xycoords='axes fraction', textcoords='offset points', va='top')
+
+
+def apply_irrig_vars(ws, var, replace_val):
+    if var != "Irrigation":
+        f = "RuleBasedIrrigationData.json"
+    else:  # direct irrigation time series to multiply
+        raise Exception("not supported yet")  #f = "MILD.csv"
+    df = pd.read_json(os.path.join(ws, f))
+    od = df[var]["Value"]
+    if isinstance(replace_val, float) or isinstance(replace_val, int):
+        df[var]["Value"] = [replace_val for x in od]
+        df.to_json(os.path.join(ws, f), indent=4)
+    elif isinstance(replace_val, list) and len(replace_val) == 5:
+        df[var]["Value"] = replace_val
+        df.to_json(os.path.join(ws, f), indent=4)
+    else:
+        raise Exception
+
+
 def yield_revenue_compare(cwds, which, d, show_plot=True):
     if not isinstance(cwds, list):  # dict
         dd = cwds.copy()
         cwds = list(cwds.keys())
-    # variables  # TODO: declare
-    #print(d.keys())
+
     #grape_price = 697.0  # $; 2019/2020 FY Riverland Shiraz grape price (see pg SA4 WA SA2020 report)
 
     block_rowwise_dist = 89  # m
