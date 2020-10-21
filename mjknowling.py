@@ -372,9 +372,10 @@ def kg_per_ha_to_tonnes(kg_per_ha):
 
 def invest_irrig_vol_to_yield_relationship():
     dfs = pd.DataFrame()
-    ws = os.path.join("Scenario01")
+    ws = os.path.join("irrig_yield_sens_tests")
     var = "IRDAYSTAGECAP"
-    scens = list(np.arange(0,10,0.25))  # daily irrig mm max
+    # irrigation allowed every day
+    scens = list(np.arange(0,25,0.5))  # daily irrig mm max
     for scen in scens:
         apply_irrig_vars(ws=ws, var=var, replace_val=scen)  # this writes json
         run_scen(ws=ws)
@@ -396,7 +397,7 @@ def invest_irrig_vol_to_yield_relationship():
     #x = np.array(xl)
     #zaddow_expt_knowl = 3.0
     #y = 10.0 + zaddow_expt_knowl * x
-    plt.plot(x, y, '--')
+    #plt.plot(x, y, '--')
     plt.ylabel("Yield (tonnes/ha)")
     plt.xlabel("Irrigation (ML/ha)")
     #plt.annotate('?', (10 ,10), (0, 9), xycoords='axes fraction', textcoords='offset points', va='top')
