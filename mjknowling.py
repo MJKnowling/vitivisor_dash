@@ -211,8 +211,6 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 ax.set_ylabel("Available Energy For \nFruit Development (FIND UNITS)")
             elif which == "FruitSink":
                 ax.set_ylabel("Fruit Development \nEnergy Sink (FIND UNITS)")
-            elif which == "supplydemand":
-                ax.set_ylabel("Fruit Energy Demand versus Available Energy")
             elif which == "VineEop":
                 ax.set_ylabel("Potential Vine Transpiration\n(cm/day)")
             elif which == "Tru":
@@ -282,8 +280,9 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             if which == "supply_demand":
                 fmt = ['-', '--']
                 for ii, k in enumerate(dfs.keys()):
-                    dfs[k].plot(ax=ax, legend=False, color=colors[i], linestyle=fmt[ii])
-                #ax.set_ylabel("Energy supply v demand")
+                    #print(scen_ws, colors[int(list(dd.keys())[i][-2:]) - 1], fmt[ii])
+                    dfs[k].plot(ax=ax, lw=2, linestyle=fmt[ii], color=colors[int(list(dd.keys())[i][-2:]) - 1], )
+                    ax.set_ylabel("Fruit Energy Demand\nversus Available Energy (UNITS)")
             elif which == "soil_water":
                 sp = pd.read_json(os.path.join("_base", "SoilProfile.json"))
                 vs = {"SLLL": "wilting point", "SDUL": "field capacity", "SSAT": "saturation"}
@@ -312,10 +311,9 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 dfs[scen_ws].plot(ax=ax, alpha=1.0, lw=2, color=colors[int(list(dd.keys())[i][-2:]) - 1])#colors[i])
                 xlim = ax.get_xlim()
                 #print(xlim)
-        if which == "soil_water":
+        if which == "soil_water" or which == "supply_demand":
             l = [x for x in dfs.keys()]
-        elif which == "supply_demand":
-            pass
+            print(l)
         else:
             if "LAI" in which:
                 #lai_obs = pd.read_csv()
@@ -331,10 +329,17 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 dfs_ref[scen_ws].plot(ax=ax, alpha=1.0, lw=2, linestyle='--', color=colors[int(list(dd.keys())[i][-2:]) - 1]) #colors[i]
         if "irrig" in which:
             ax.legend([dd[x] for x in l], loc='upper right')
-        elif which != "soil_water" and which != "supply_demand":
+        elif which != "soil_water":
             if which == "LAI":
                 l = [dd[x] for x in dfs.columns]
                 l = l + list(lai_obs.columns)
+                ax.legend(l)
+            elif which == "supply_demand":
+                print("TODO")
+                #print(l, [dd[x] for x in l])
+                l = [dd[x] for x in l]
+                l = l + list(states)
+                #print(l)
                 ax.legend(l)
             else:
                 ax.legend([dd[x] for x in l])
