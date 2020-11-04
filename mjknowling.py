@@ -276,7 +276,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
 
         # financial benchmarking
         if "irrigation" in which:
-            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Riverland case study average*: 8.43 ML/ha", 
+            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="VitiVisor Riverland case study average*: 8.43 ML/ha", 
                 ha='center', va='center', fontsize=24, color='k')
             #plt.annotate('Note: Average irrigation data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
     else:
@@ -503,8 +503,8 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             avg_red_yield_per_ha, avg_white_yield_per_ha = 22.27, 28.70
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
             _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
-            ax.axhline(y=avg_red_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
-            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="Riverland red variety average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.axhline(y=avg_red_yield_per_ha, linewidth=2, color='k', alpha=1.0,)
+            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="VitiVisor Riverland red variety average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
             #ax.axhline(y=avg_white_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
             #ax.text(x=_x, y=avg_white_yield_per_ha - (0.02 * avg_red_yield_per_ha), va='top', ha='center', s="White variety average*", fontsize=12, alpha=1.0, bbox=props)
 
@@ -531,8 +531,8 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             avg_revenue_per_ha = 14007
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
             _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
-            ax.axhline(y=avg_revenue_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
-            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.axhline(y=avg_revenue_per_ha, linewidth=2, color='k', alpha=1.0,)
+            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="VitiVisor Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
         #plt.annotate('Note: Average harvest revenue data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
@@ -570,9 +570,9 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
     #print({x: d[mapper[x]]['diversion_factor'] for x, a in dolla_irr_scen.items()})
 
     # (avg pump size) kWh/ML * (avg electricity rate) $/kW --> $/ML
-    electricity_per_ML = 200.0 * 0.25  # TODO: check the kWh/ML value # https://www.pumpindustry.com.au/measuring-pumping-costs-for-electric-irrigation-pumps
+    #electricity_per_ML = 200.0 * 0.25  # TODO: check the kWh/ML value # https://www.pumpindustry.com.au/measuring-pumping-costs-for-electric-irrigation-pumps
 
-    dolla_irr_scen = {x: ((a * (1 - d[mapper[x]]['diversion_factor']) * d[mapper[x]]['water_delivery_rate']) + (a * (d[mapper[x]]['diversion_factor']) * electricity_per_ML) if dolla_irr_scen[x] <= (d[mapper[x]]['water_entitlement'] * d[mapper[x]]['allocation_factor'])
+    dolla_irr_scen = {x: ((a * (1 - d[mapper[x]]['diversion_factor']) * d[mapper[x]]['water_delivery_rate']) + (a * (d[mapper[x]]['diversion_factor']) * d[mapper[x]]['water_pumping_rate']) if dolla_irr_scen[x] <= (d[mapper[x]]['water_entitlement'] * d[mapper[x]]['allocation_factor'])
                           else a * d[mapper[x]]['water_delivery_rate'] + ((dolla_irr_scen[x] - (d[mapper[x]]['water_entitlement'] * d[mapper[x]]['allocation_factor'])) * d[mapper[x]]['water_market_rate']))
                           for x, a in dolla_irr_scen.items()
                           }
@@ -628,8 +628,8 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
             avg_gross_margin_per_ha = 7303
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
             _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
-            ax.axhline(y=avg_gross_margin_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
-            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.axhline(y=avg_gross_margin_per_ha, linewidth=2, color='k', alpha=1.0,)
+            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="VitiVisor Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
 
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
         plt.ylabel("Gross Margin ($/ha)")

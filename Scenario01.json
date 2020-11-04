@@ -33,7 +33,7 @@
         },
         "Water delivery cost":{
             "Value":60.0,
-            "Description":"Variable water delivery cost; CIT on-peak is $60 per ML",
+            "Description":"Variable water delivery cost via CIT/RIT. This is applicable where Private diversion factor is less than 1.0. CIT on-peak is $60 per ML",
             "Units":"$ per ML"
         },
         "Water market cost":{
@@ -48,12 +48,17 @@
         },
         "Water allocation factor":{
             "Value":1.0,
-            "Description":"Water allocation multiplier factor; this value is defined annually for SA",
+            "Description":"Water allocation multiplier factor (e.g., relating to fortnightly/monthly SA River Murray allocation factor)",
             "Units":""
         },
         "Private diversion factor":{
             "Value":0.0,
             "Description":"Proportion of patch that is fed via private diversions (i.e., where electricity is only irrigation cost). A value of 0.0 means that all water is delivered via CIT (see above); a value of 1.0 means that all water is pumped directly.",
+            "Units":""
+        },
+        "Water pumping cost":{
+            "Value":50.0,
+            "Description":"Water delivery cost via private diversion pumping. This is applicable where Private diversion factor is greater than 0.0. $50/ML corresponds to a pump running at 200 kWh/ML, at $0.25/kWh.",
             "Units":""
         },
         "Cost per spray":{
@@ -67,7 +72,7 @@
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":12,
+            "Value":14,
             "Description":"Number of spray applications for season",
             "Units":""
         },
