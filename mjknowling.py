@@ -212,9 +212,9 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which == "soil_water_stress1":
                 ax.set_ylabel("{} Index (-)".format(which.replace("_", " ").title().strip("1")))
             elif which == "Cpool":
-                ax.set_ylabel("Available Energy For \nFruit Development (FIND UNITS)")
+                ax.set_ylabel("Available Energy For \nFruit Development (UNITS)")
             elif which == "FruitSink":
-                ax.set_ylabel("Fruit Development \nEnergy Sink (FIND UNITS)")
+                ax.set_ylabel("Fruit Development \nEnergy Sink (UNITS)")
             elif which == "VineEop":
                 ax.set_ylabel("Potential Vine Transpiration\n(cm/day)")
             elif which == "Tru":
@@ -228,11 +228,11 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which == "shoot_num":
                 ax.set_ylabel("Shoot Count (Per Vine)")
             elif which == "Vcarbo":
-                ax.set_ylabel("Actual Carbon Assimilate (Dry\nMatter) Produced (UNITS)")
+                ax.set_ylabel("Actual Carbon Assimilate (Dry\nMatter) Produced (grams)")
             elif which == "Pcarb":
-                ax.set_ylabel("Potential Carbon (Dry Matter)\nProduction (UNITS)")
+                ax.set_ylabel("Potential Carbon (Dry Matter)\nProduction (grams)")
             elif which == "Vreserve":
-                ax.set_ylabel("Reserve Energy Store (UNITS)")
+                ax.set_ylabel("Reserve Energy Store (grams)")
     
     if which != "soil_water" and which != "supply_demand":
         dfs = pd.DataFrame(dfs)
