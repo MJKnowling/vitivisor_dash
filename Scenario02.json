@@ -2,7 +2,7 @@
     "6 ML/ha,\nShiraz,\nSchwarzmann":{
         "Crush Price":{
             "Value":697.0,
-            "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
+            "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonne, and for Chardonnay was ~$450 per tonne.",
             "Units":"$ per tonne"
         },
         "Description":"Description of `Scenario02`",
@@ -62,13 +62,13 @@
             "Units":""
         },
         "Cost per spray":{
-            "Value":1000.0,
-            "Description":"Cost of average spray pass, including chemical, labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
+            "Value":207.0,
+            "Description":"Cost of average spray pass, including chemical, labour and fuel costs. This default value is derived from VitiVisor Riverland financial benchmarking data.",
             "Units":"$"
         },
         "Cost per tip":{
-            "Value":150.0,
-            "Description":"Cost of average tip pass, including labour and fuel costs; can alternatively estimate from rowwise distance, rate, fuel efficiency, labour rate, ...",
+            "Value":135.0,
+            "Description":"Cost of average tip pass, including labour and fuel costs. This default value is derived from VitiVisor Riverland financial benchmarking data.",
             "Units":"$"
         },
         "Number of sprays":{
