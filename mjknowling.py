@@ -158,6 +158,10 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             yl.append(ax.get_ylim()[1])
             xl = ax.get_xlim()[1]
             df = df.loc[:, which]
+
+        if which == "Brix":
+            df = df / 1.8 # https://www.awri.com.au/wp-content/uploads/2018/04/s1809.pdf
+
         dfs[scen_ws] = df
 
         if which == "rain" and total is True:
@@ -184,7 +188,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
             elif which.lower() == "FruitDw".lower():
                 ax.set_ylabel("Fruit (Dry) Weight\n (grams)")
             elif which.lower() == "Brix".lower():
-                ax.set_ylabel("Brix\n(degrees)")
+                ax.set_ylabel("Baume\n(degrees) (1 degree Baume = 1.8 degrees Brix)")  #"Brix\n(degrees)")
             elif which == "infiltration":
                 ax.set_ylabel("{} (cm/day)".format(which.title()))
             elif which == "evap":
@@ -229,6 +233,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 ax.set_ylabel("Potential Carbon (Dry Matter)\nProduction (UNITS)")
             elif which == "Vreserve":
                 ax.set_ylabel("Reserve Energy Store (UNITS)")
+    
     if which != "soil_water" and which != "supply_demand":
         dfs = pd.DataFrame(dfs)
     if which == "ATheta":# or which == "soil_water":
@@ -271,7 +276,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
 
         # financial benchmarking
         if "irrigation" in which:
-            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Case study average*: 8.43 ML/ha", 
+            ax.text(x=xl / 2, y=(max(yl) * text_height_irr[i]) - 0.2, s="Riverland case study average*: 8.43 ML/ha", 
                 ha='center', va='center', fontsize=24, color='k')
             #plt.annotate('Note: Average irrigation data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
     else:
@@ -401,20 +406,8 @@ def invest_irrig_vol_to_yield_relationship(ws):
     var = "IRDAYSTAGECAP"
     # irrigation allowed every day
     scens = list(np.arange(0,25,0.5))  # daily irrig mm max
-    rain = "org"  # "low"
     for scen in scens:
         apply_irrig_vars(ws=ws, var=var, replace_val=scen)  # this writes json
-        
-        # other relevant variables in invest
-        # rain
-        #if rain == "low":  # rain multiplied by 0.75
-         #   if os.path.exists(os.path.join(ws, "MILD.csv")):
-          #      os.remove(os.path.join(ws, "MILD.csv"))
-           # shutil.copy2(os.path.join(ws, "MILD_low.csv"), os.path.join(ws, "MILD.csv"))
-        #else:
-         #   if os.path.exists(os.path.join(ws, "MILD.csv")):
-          #      os.remove(os.path.join(ws, "MILD.csv"))
-           # shutil.copy2(os.path.join(ws, "MILD_org.csv"), os.path.join(ws, "MILD.csv"))
 
         run_scen(ws=ws)
         # get irrig vol 
@@ -427,10 +420,13 @@ def invest_irrig_vol_to_yield_relationship(ws):
         q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
         # get yield
         y = kg_per_ha_to_tonnes(pd.read_csv(os.path.join(ws, vines_summ_fname)).loc[:, "Yield"][0])
-        df = pd.DataFrame([y], index=[q_per_ha], columns=["yield"])
+        df = pd.DataFrame(data=np.array([[q_per_ha, y]]), columns=["qy_irrig","qy_yield"])
         dfs = pd.concat((dfs, df))
+
+    dfs.to_csv("q_y_pairs.csv")  # for pst
+
     fig, ax = plt.subplots()
-    dfs.plot(ax=ax, legend=False, style='o-')
+    dfs.plot(x='qy_irrig', y='qy_yield', ax=ax, legend=False, style='o-')
     #xl = ax.get_xlim()
     #x = np.array(xl)
     #zaddow_expt_knowl = 3.0
@@ -506,9 +502,9 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             # financial benchmarking  # TODO
             avg_red_yield_per_ha, avg_white_yield_per_ha = 22.27, 28.70
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
-            _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
+            _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_red_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
-            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="Red variety average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_red_yield_per_ha - (0.02 * avg_red_yield_per_ha), s="Riverland red variety average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
             #ax.axhline(y=avg_white_yield_per_ha, linewidth=2, color='k', alpha=1.0, label="Red variety average")
             #ax.text(x=_x, y=avg_white_yield_per_ha - (0.02 * avg_red_yield_per_ha), va='top', ha='center', s="White variety average*", fontsize=12, alpha=1.0, bbox=props)
 
@@ -534,9 +530,9 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
             # financial benchmarking  # TODO
             avg_revenue_per_ha = 14007
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
-            _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
+            _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_revenue_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
-            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
         #plt.annotate('Note: Average harvest revenue data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
@@ -631,9 +627,9 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
             # financial benchmarking
             avg_gross_margin_per_ha = 7303
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
-            _x = xlim[1] - (0.2 * (xlim[1] - xlim[0]))
+            _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_gross_margin_per_ha, linewidth=2, color='k', alpha=1.0, label="Case study average")
-            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="Case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_gross_margin_per_ha - (0.02 * avg_gross_margin_per_ha), s="Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
 
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in keys])
         plt.ylabel("Gross Margin ($/ha)")
