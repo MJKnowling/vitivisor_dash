@@ -1,7 +1,7 @@
 {
   "FileDescription" : "This file contains parameters previously hard coded in VineLOGIC",
   "RootCho" : {
-    "Value" : 80,
+    "Value" : 40,
     "Units" : "g/Kg",
     "Description" : "Root carbohydrate per kg of dry matter"
   },
