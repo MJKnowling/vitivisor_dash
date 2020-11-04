@@ -1,5 +1,5 @@
 {
-    "2 ML/ha,\nShiraz,\nSchwarzmann":{
+    "6 ML/ha,\nShiraz,\nOwn Roots":{
         "Crush Price":{
             "Value":697.0,
             "Description":"Crush price. For reference, in 2019-2020, average price for Shiraz was $697 per tonnec, and for Chardonnay was ~$450 per tonne.",
@@ -7,22 +7,22 @@
         },
         "Description":"Description of `Scenario02`",
         "Maximum irrigation mm per phenology":{
-            "Value":200.0,
+            "Value":500.0,
             "Description":"Maximum irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Maximum daily irrigation mm per phenology":{
-            "Value":[2,2,2,2,2],
+            "Value":5.8,
             "Description":"Maximum daily irrigation depth (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"mm"
         },
         "Soil water irrigation trigger per phenology":{
-            "Value":30.0,
+            "Value":35.0,
             "Description":"Critical percentage of extractable soil water to trigger an irrigation for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
         "Soil water irrigation defict refill percent per phenology":{
-            "Value":5.0,
+            "Value":10.0,
             "Description":"The percentage of deficit to refill for each major growth stage (applied to all phenological stages if float; alternatively per phenological stage if list of length 5)",
             "Units":"%"
         },
@@ -67,7 +67,7 @@
             "Units":"$"
         },
         "Number of sprays":{
-            "Value":8,
+            "Value":12,
             "Description":"Number of spray applications for season",
             "Units":""
         },
@@ -77,7 +77,7 @@
             "Units":""
         },
         "Rootstock":{
-            "Value":"Schwarzmann",
+            "Value":"Own Roots",
             "Description":"Type of rootstock (currently supported options include: Own Roots, Ramsey, Schwarzmann)",
             "Units":""
         },
