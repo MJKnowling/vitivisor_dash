@@ -88,7 +88,7 @@
         },
         "Variety":{
             "Value":"Shiraz",
-            "Description":"Grape variety (currently supported options include: Shiraz, Chardonnay, Cabernet Sauvignon, Colombard)",
+            "Description":"Grape variety (currently supported options include: Shiraz; currently in process of supporting Chardonnay, Cabernet Sauvignon, Colombard)",
             "Units":""
         }
     }
