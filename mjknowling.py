@@ -355,6 +355,42 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
 
     return q_irr_scen, lai_irr_scen, (fig, ax)
 
+def process_scen_json(scen_json_fname):
+    mapper = {"Crush Price": "grape_price", 
+              "Maximum irrigation mm per phenology": "IRSTAGECAP",
+              "Maximum daily irrigation mm per phenology": "IRDAYSTAGECAP",
+              "Water market cost": "water_market_rate",
+              "Water delivery cost": "water_delivery_rate",
+              "Water entitlement": "water_entitlement",
+              "Water allocation factor": "allocation_factor",
+              "Private diversion factor": "diversion_factor",
+              "Water pumping cost": "water_pumping_rate",
+              "Cost per tip": "costs_per_tip", "Number of tips": "ntips",
+              "Cost per spray": "costs_per_spray", "Number of sprays": "nsprays",
+              "Days between irrigation applications per phenology": "IRRETNPERIOD", 
+              "Soil water irrigation trigger per phenology": "IRCRITSW",
+              "Soil water irrigation defict refill percent per phenology": "IRREFILLPER", 
+              "Rootstock": "Rootstock",
+              "Variety": "Variety",
+             }
+    d = {}
+    js = pd.read_json(os.path.join(scen_json_fname))
+    js = js[js.keys()[0]]  # there is only one scen per file
+    for k, v in js.items():
+        if k != "Description":
+            d[mapper[k]] = v["Value"]
+            #if "irr" in k:
+             #   print(k)
+              #  d[mapper[k]]["Value"] = v["Value"]
+               # d[mapper[k]]["vinelogic_file"] = "RuleBasedIrrigation.json"
+            #else:
+             #   d[mapper[k]] = v["Value"]
+    #   sorted()
+    #for js in js.unique():
+    #update
+    #write
+    return d
+
 def process_pai_obs():
     fs = [x for x in os.listdir(os.path.join("_data","pai"))]
     dfs = pd.DataFrame()
@@ -400,43 +436,85 @@ def fruit_supply_demand_ts_plot(ws):
     plt.savefig("fruit_supply_demand.pdf")
     #plt.close()
 
-def invest_irrig_vol_to_yield_relationship(ws):
+def invest_irrig_vol_to_yield_relationship(ws, include_gross_margin=False):
     dfs = pd.DataFrame()
     ws = os.path.join(ws)
+    scen_name = pd.read_json(os.path.join(ws+".json")).keys()[0]
+    #assert scen_name == "RVL avg ML/ha,\nShiraz,\nSchwarzmann"  # temp
     var = "IRDAYSTAGECAP"
     # irrigation allowed every day
-    scens = list(np.arange(0,25,0.5))  # daily irrig mm max
+    scens = list(np.arange(0,25,5.0))  # daily irrig mm max
     for scen in scens:
+        print("running {}...".format(scen))
         apply_irrig_vars(ws=ws, var=var, replace_val=scen)  # this writes json
-
         run_scen(ws=ws)
         # get irrig vol 
-        df = pd.read_csv(os.path.join(ws, vines_out_fname), index_col="DayOfYear")
-        dates = pd.date_range(start_date, periods=daily_time_steps)
-        df.index = dates
-        df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 31), '%Y-%m-%d'):
-                    datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
-        df = df.loc[:, "irrigation"]
-        q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
+        #df = pd.read_csv(os.path.join(ws, vines_out_fname), index_col="DayOfYear")
+        #dates = pd.date_range(start_date, periods=daily_time_steps)
+        #df.index = dates
+        #df = df.loc[datetime.strftime(start_date + timedelta(365 + (365 / 2) + 31), '%Y-%m-%d'):
+         #           datetime.strftime(start_date + timedelta(365*2 + (365/2)), '%Y-%m-%d'), :] #timedelta(900), '%Y-%m-%d'), :]
+        #df = df.loc[:, "irrigation"]
+        #q, q_per_ha = mm_to_ML_irrig(df.sum())  # compute sum in ML
         # get yield
-        y = kg_per_ha_to_tonnes(pd.read_csv(os.path.join(ws, vines_summ_fname)).loc[:, "Yield"][0])
-        df = pd.DataFrame(data=np.array([[q_per_ha, y]]), columns=["qy_irrig","qy_yield"])
-        dfs = pd.concat((dfs, df))
+        #y = kg_per_ha_to_tonnes(pd.read_csv(os.path.join(ws, vines_summ_fname)).loc[:, "Yield"][0])
+        dd = process_scen_json(scen_json_fname=str(ws)+".json")
+        d = {}
+        d[scen_name] = dd
+        ws_d = {}
+        keys = list(d.keys())
+        ws_d[ws] = scen_name
 
-    dfs.to_csv("q_y_pairs.csv")  # for pst
+        q_irr_scen, _, _ = ts_compare_irrig_plot(cwds=ws_d, which="irrigation", d=d, show_plot=False)
+        dolla_irr_scen, _ = irrig_compare(q_irr_scen, d=d, mapper=ws_d, show_plot=False)
+        y = yield_revenue_compare(cwds=ws_d, which="revenue", d=d, show_plot=False, return_yield=True)[ws]
+        plt.close()
+        q_irr_scen = q_irr_scen[ws]
+        if include_gross_margin:
+            revenue, _ = yield_revenue_compare(cwds=ws_d, which="revenue", d=d, show_plot=False)
+            _, lai_irr_scen, _ = ts_compare_irrig_plot(cwds=ws_d, which="lai", d=d, show_plot=False)
+            spray_cost, tip_cost = lai_to_canopy_disease_mgmt(lai_irr_scen, d=d, mapper=ws_d)
+            gm = gross_margin(dolla_irr_scen, revenue, which="gross_margin", d=d, mapper=ws_d,
+                include_disease_mgmt=True, include_canopy_mgmt=True, spray_cost=spray_cost, tip_cost=tip_cost, just_gm=True)[ws]
+            plt.close()
+            
+            df = pd.DataFrame(data=np.array([[q_irr_scen, y, gm]]), columns=["qygm_irrig","qygm_yield","qygm_gm"])
+            dfs = pd.concat((dfs, df))
+        else:
+            df = pd.DataFrame(data=np.array([[q_irr_scen, y]]), columns=["qy_irrig","qy_yield"])
+            dfs = pd.concat((dfs, df))
+
+    if include_gross_margin:
+        dfs.to_csv("q_y_gm_pairs.csv")
+    else:
+        dfs.to_csv("q_y_pairs.csv")
 
     fig, ax = plt.subplots()
-    dfs.plot(x='qy_irrig', y='qy_yield', ax=ax, legend=False, style='o-')
-    #xl = ax.get_xlim()
-    #x = np.array(xl)
-    #zaddow_expt_knowl = 3.0
-    #y = 10.0 + zaddow_expt_knowl * x
-    #plt.plot(x, y, '--')
-    plt.ylabel("Yield (tonnes/ha)")
-    plt.xlabel("Irrigation (ML/ha)")
-    #plt.annotate('?', (10 ,10), (0, 9), xycoords='axes fraction', textcoords='offset points', va='top')
+    if include_gross_margin:
+        #dfs.plot(x='qygm_irrig', y='qygm_yield', ax=ax, legend=False, style='o-')
+        ax.plot(dfs['qygm_irrig'], dfs['qygm_yield'], 'bo-')#legend=False, style='o-')
+        #dfs.plot(x='qygm_irrig', y='qygm_gm', ax=ax1, legend=False, style='o-')
+        ax2 = ax.twinx()
+        ax2.plot(dfs['qygm_irrig'], dfs['qygm_gm'], 'ro--')#legend=False, style='o-')
+        ax.set_xlabel("Irrigation (ML/ha)")
+        ax.set_ylabel("Yield (tonnes/ha)")
+        ax2.set_ylabel("Gross Margin ($/ha)")
+        ax2.spines['right'].set_color('red')
+        ax2.yaxis.label.set_color('red')
+        ax2.tick_params(axis='y', colors='red')
+    else:
+        dfs.plot(x='qy_irrig', y='qy_yield', ax=ax, legend=False, style='o-')
+        #zaddow_expt_knowl = 3.0
+        #y = 10.0 + zaddow_expt_knowl * x
+        #plt.plot(x, y, '--')
+        plt.ylabel("Yield (tonnes/ha)")
+        plt.xlabel("Irrigation (ML/ha)")
+        #plt.annotate('?', (10 ,10), (0, 9), xycoords='axes fraction', textcoords='offset points', va='top')
     plt.tight_layout()
-    plt.savefig("dy_dq.pdf")
+    if include_gross_margin:
+        plt.savefig("dy_dgm_dq.pdf")
+    else:
+        plt.savefig("dy_dq.pdf")
 
 def apply_irrig_vars(ws, var, replace_val):
     if var != "Irrigation":
@@ -455,7 +533,7 @@ def apply_irrig_vars(ws, var, replace_val):
         raise Exception
 
 
-def yield_revenue_compare(cwds, which, d, show_plot=True):
+def yield_revenue_compare(cwds, which, d, show_plot=True, return_yield=False):
     if not isinstance(cwds, list):  # dict
         dd = cwds.copy()
         cwds = list(cwds.keys())
@@ -474,6 +552,8 @@ def yield_revenue_compare(cwds, which, d, show_plot=True):
     for scen_ws in cwds:
         yields[scen_ws] = kg_per_ha_to_tonnes(pd.read_csv(os.path.join(scen_ws, vines_summ_fname))
                                               .loc[:, "Yield"][0])
+    if return_yield:
+        return yields
 
     # revenue (using grape price)
     yield_rev = yields.copy()
@@ -603,7 +683,7 @@ def irrig_compare(q_irr_scen, d, mapper, show_plot=True):
 
 
 def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, tip_cost=0.0, include_canopy_mgmt=True,
-                 include_disease_mgmt=True):
+                 include_disease_mgmt=True, just_gm=False):
     revenue = grape_revenue
     cost = irrig_cost
     if isinstance(spray_cost, dict) and include_disease_mgmt:
@@ -615,6 +695,8 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
     ax = plt.subplot(111)
     if which == "gross_margin":
         gross_margin = {key: revenue[key] - cost.get(key, 0) for key in revenue}
+        if just_gm:
+            return gross_margin
         keys = gross_margin.keys()
         values = gross_margin.values()
         b = ax.bar(keys, values)
