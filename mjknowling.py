@@ -729,27 +729,27 @@ def gross_margin(irrig_cost, grape_revenue, which, d, mapper, spray_cost=0.0, ti
             c.append(key)
             v.append(val)
         v = np.array(v)
-        b = ax.bar(range(len(c)), v[:, 0], label="irrigation", alpha=1.0,)
-        for i, k in enumerate(c):
+        b = ax.bar(range(len(c)), v[:, 0], label="irrigation", color='w', hatch='o', edgecolor='k')#alpha=0.5,)
+        #for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
             #else:
              #   b[i].set_color('#1f77b4')
-            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
-        b = ax.bar(range(len(c)), v[:, 1], bottom=v[:, 0], label="spray", alpha=0.3)
-        for i, k in enumerate(c):
+         #   b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
+        b = ax.bar(range(len(c)), v[:, 1], bottom=v[:, 0], label="spray", color='w', hatch='/', edgecolor='k')#alpha=0.5)
+        #for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
             #else:
              #   b[i].set_color('#1f77b4')
-            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
-        b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", alpha=0.7)
-        for i, k in enumerate(c):
+         #   b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
+        b = ax.bar(range(len(c)), v[:, 2], bottom=v[:, 0], label="tip", color='w', hatch='x', edgecolor='k')#alpha=0.5)
+        #for i, k in enumerate(c):
             #if i != 0:#if "base" not in k.lower():
              #   b[i].set_color('#ff7f0e')  # assume two scens only
             #else:
              #   b[i].set_color('#1f77b4')
-            b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
+         #   b[i].set_color(colors[int(list(mapper.keys())[i][-2:]) - 1])#colors[i])
         ax.legend()
         plt.xticks(range(len(c)), c)
         ax.set_xticklabels([mapper[x].split("_")[-1] for x in c])
