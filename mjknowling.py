@@ -318,7 +318,7 @@ def ts_compare_irrig_plot(cwds, which, d, show_plot=True, total=False):
                 #print(xlim)
         if which == "soil_water" or which == "supply_demand":
             l = [x for x in dfs.keys()]
-            print(l)
+            #print(l)
         else:
             if "LAI" in which:
                 #lai_obs = pd.read_csv()
@@ -443,7 +443,7 @@ def invest_irrig_vol_to_yield_relationship(ws, include_gross_margin=False):
     #assert scen_name == "RVL avg ML/ha,\nShiraz,\nSchwarzmann"  # temp
     var = "IRDAYSTAGECAP"
     # irrigation allowed every day
-    scens = list(np.arange(0,25,5.0))  # daily irrig mm max
+    scens = list(np.arange(0,25,0.5))  # daily irrig mm max
     for scen in scens:
         print("running {}...".format(scen))
         apply_irrig_vars(ws=ws, var=var, replace_val=scen)  # this writes json
@@ -612,7 +612,7 @@ def yield_revenue_compare(cwds, which, d, show_plot=True, return_yield=False):
             props = dict(boxstyle='square', facecolor='white', alpha=0.3, edgecolor='none')
             _x = xlim[1] - (0.25 * (xlim[1] - xlim[0]))
             ax.axhline(y=avg_revenue_per_ha, linewidth=2, color='k', alpha=1.0,)
-            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="VitiVisor Riverland case study average*", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
+            ax.text(x=_x, y=avg_revenue_per_ha - (0.02 * avg_revenue_per_ha), s="VitiVisor Riverland case study average\n(includes grape revenue only)", va='top', ha='center', fontsize=12, alpha=1.0, bbox=props)
         ax.set_xticklabels([dd[x].split("_")[-1] for x in keys])
         plt.ylabel("Harvest Revenue ($/ha)")  #**tmp**
         #plt.annotate('Note: Average harvest revenue data ... \nHere this is compared to ....', (0,0), (0, -65), xycoords='axes fraction', textcoords='offset points', va='top')
@@ -802,7 +802,7 @@ def lai_to_spray_cost(lai_irr_scen, d, mapper):#block_rowwise_dist, fuel_effic, 
     #sum_costs_per_spray = d[]
     #print("cost per spray: {}".format(sum_costs_per_spray))
     #spray_cost = {x: a * sum_costs_per_spray for (x, a) in spray_cost.items()}
-    spray_cost = {x: d[mapper[x]]['costs_per_spray'] for x, a in spray_cost.items()}    
+    spray_cost = {x: a * d[mapper[x]]['costs_per_spray'] for x, a in spray_cost.items()}
 
     return spray_cost
 
@@ -831,7 +831,7 @@ def lai_to_tip_cost(lai_irr_scen, d, mapper):#block_rowwise_dist, fuel_effic, fu
     #sum_costs_per_tip = fuel_consump_per_tip + labour_cost_per_tip
     #print("cost per tip: {}".format(sum_costs_per_tip))
     #tip_cost = {x: a * sum_costs_per_tip for (x, a) in tip_cost.items()}
-    tip_cost = {x: d[mapper[x]]['costs_per_tip'] for x, a in tip_cost.items()}   
+    tip_cost = {x: a * d[mapper[x]]['costs_per_tip'] for x, a in tip_cost.items()}
 
     return tip_cost
 
