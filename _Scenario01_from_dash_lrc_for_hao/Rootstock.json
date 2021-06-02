@@ -1,0 +1,27 @@
+{
+    "FileDescription":{
+        "Value":"This file contains rootstock properites for salt and aeration sensitivity",
+        "Units":"This file contains rootstock properites for salt and aeration sensitivity",
+        "Description":"This file contains rootstock properites for salt and aeration sensitivity"
+    },
+    "RootstockName":{
+        "Value":"Schwarzmann",
+        "Units":"NA",
+        "Description":"Name of Rootstock"
+    },
+    "RootstockID":{
+        "Value":"00005",
+        "Units":"NA",
+        "Description":"ID of Rootstock"
+    },
+    "RstockVigIndex":{
+        "Value":9,
+        "Units":"NA",
+        "Description":"Vigour range of root stocks"
+    },
+    "RstockAernSens":{
+        "Value":9,
+        "Units":"NA",
+        "Description":"Rootstock Aeration sensitivity"
+    }
+}

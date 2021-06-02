@@ -1,0 +1,42 @@
+{
+    "FileDescription":{
+        "Value":"This file contains cultivar properites for vine stage and berry growth",
+        "Units":"This file contains cultivar properites for vine stage and berry growth",
+        "Description":"This file contains cultivar properites for vine stage and berry growth"
+    },
+    "SetDD":{
+        "Value":100,
+        "Units":"DegreesCelciusDays",
+        "Description":""
+    },
+    "BeginVerdd":{
+        "Value":700,
+        "Units":"DegreesCelciusDays",
+        "Description":""
+    },
+    "dw1":{
+        "Value":0.000175,
+        "Units":"NA",
+        "Description":""
+    },
+    "dw2":{
+        "Value":0.0012,
+        "Units":"NA",
+        "Description":""
+    },
+    "critbrix":{
+        "Value":19,
+        "Units":"DegreesBrix",
+        "Description":""
+    },
+    "banth":{
+        "Value":0.0,
+        "Units":"",
+        "Description":""
+    },
+    "canth":{
+        "Value":0.0,
+        "Units":"",
+        "Description":""
+    }
+}

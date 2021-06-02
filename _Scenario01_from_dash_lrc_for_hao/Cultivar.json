@@ -1,0 +1,52 @@
+{
+    "FileDescription":{
+        "Value":"This file contains cultivar properites for vine stages",
+        "Units":"This file contains cultivar properites for vine stages",
+        "Description":"This file contains cultivar properites for vine stages"
+    },
+    "VarietyName":{
+        "Value":"CHARDONNAY",
+        "Units":"NA",
+        "Description":"Varierty of berry"
+    },
+    "VarietyID":{
+        "Value":"IB0007",
+        "Units":"NA",
+        "Description":"ID of berry"
+    },
+    "P1VV":{
+        "Value":5,
+        "Units":"DegreesCelciusDays",
+        "Description":"Thermal time to end vernilization"
+    },
+    "P2BB":{
+        "Value":265,
+        "Units":"DegreesCelciusDays",
+        "Description":"Thermal time to bud burst"
+    },
+    "P3FF":{
+        "Value":170,
+        "Units":"DegreesCelciusDays",
+        "Description":"Thermal time to first flower"
+    },
+    "P4HH":{
+        "Value":1500,
+        "Units":"DegreesCelciusDays",
+        "Description":"Thermal time from set to harvest"
+    },
+    "P5LF":{
+        "Value":800,
+        "Units":"DegreesCelciusDays",
+        "Description":"Thermal time from harvest to leaf fall"
+    },
+    "G1BN":{
+        "Value":0.5,
+        "Units":"NA",
+        "Description":"Genetic coefficient used in number of berry shoots"
+    },
+    "PHINT":{
+        "Value":50.0,
+        "Units":"DegreesCelciusDays",
+        "Description":"Used to determine thermal time fraction for leaf growth"
+    }
+}
