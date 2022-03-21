@@ -1,0 +1,133 @@
+{
+  "FileDescription" : "This file contains parameters previously hard coded in VineLOGIC",
+  "RootCho" : {
+    "Value" : 90,
+    "Units" : "g/Kg",
+    "Description" : "Root carbohydrate per kg of dry matter"
+  },
+  "RootDwFrac" : {
+    "Value" : 0.65,
+    "Units" : "NA",
+    "Description" : "Root Dry weight, as a fraction of trunk dry weight"
+  },
+  "Tbase" : {
+    "Value" : 7.5,
+    "Units" : "DegreesCelcius",
+    "Description" : "Baseline temperature for thermal time calculations"
+  },
+  "CritWFPS" : {
+    "Value" : 0.65,
+    "Units" : "",
+    "Description" : "Critical limit for water filled pore space"
+  },
+  "MaxRootDepth" : {
+    "Value" : 100,
+    "Units" : "cm",
+    "Description" : "Maximum root depth"
+  },
+  "Setdd" : {
+    "Value" : 200,
+    "Units" : "DegreesCelciusDays",
+    "Description" : "A thermal time requirement after first flower"
+  },
+  "maxLAI" : {
+    "Value" : 5,
+    "Units" : "NA",
+    "Description" : "An upper limit on Leaf Area Index growth"
+  },
+  "TrimTrigLAI" : {
+    "Value" : [ 2.974991242770652189, 2.560462420092453950, 3.500000000000000000, 2.927517198392646680, 2.604648511123029309, 3.055223679733269471, 2.998882883517610232, 2.826463858307649790, 2.759062928488781985, 3.500000000000000000 ],
+    "Units" : "",
+    "Description" : "Critical LAI to trigger canopy trimming (when trim date is not known, e.g., in future). Assume max 10 trims."
+  },
+  "TrimRedLAI" : {
+    "Value" : [ 1.26119417238662734, 1.00609611455366088, 1.14096605170823273, 1.08101745181816389, 0.96074256979106287, 1.18580447960131252, 0.93210068610779384, 0.60283215014205438, 0.80708706228684679, 0.94242213207699388 ],
+    "Units" : "",
+    "Description" : "Reduction in LAI following canopy trimming. Assume max 10 trims."
+  },
+  "InitialSoilWaterMult" : {
+    "Value" : 1.05790814161952972938252060,
+    "Units" : "",
+    "Description" : ""
+  },
+  "SLLLMult" : {
+    "Value" : 1.01064987282377,
+    "Units" : "",
+    "Description" : ""
+  },
+  "SDULMult" : {
+    "Value" : 1.02355062014450,
+    "Units" : "",
+    "Description" : ""
+  },
+  "SSATMult" : {
+    "Value" : 1.04591741511124,
+    "Units" : "",
+    "Description" : ""
+  },
+  "SRGFMult" : {
+    "Value" : 1.03016700963336,
+    "Units" : "",
+    "Description" : ""
+  },
+  "SSKSMult" : {
+    "Value" : 0.99131208247470,
+    "Units" : "",
+    "Description" : ""
+  },
+  "SBDMMult" : {
+    "Value" : 1.09083137326194,
+    "Units" : "",
+    "Description" : ""
+  },
+  "CropFactMult" : {
+    "Value" : 1.034518557112862558,
+    "Units" : "",
+    "Description" : ""
+  },
+  "BerryTTEarlyAdj" : {
+    "Value" : 2.109172910165840075791,
+    "Units" : "",
+    "Description" : ""
+  },
+  "BerryTTLateAdj" : {
+    "Value" : 4.38075024005615443201,
+    "Units" : "",
+    "Description" : ""
+  },
+  "PropAccessResvMult" : {
+    "Value" : 1.005721468059272316608599,
+    "Units" : "",
+    "Description" : ""
+  },
+  "DwCoeff3Mult" : {
+    "Value" : 1.100000000000000089,
+    "Units" : "",
+    "Description" : ""
+  },
+  "FruitSinkMult" : {
+    "Value" : 1.0359421204975143294,
+    "Units" : "",
+    "Description" : ""
+  },
+  "PARFracMult" : {
+    "Value" : 0.98664789794735930,
+    "Units" : "",
+    "Description" : ""
+  },
+  "IRDAYSTAGECAPMult" : {
+    "Value" : 1.00000000000000000000000,
+    "Units" : "",
+    "Description" : ""
+  },
+  "UseTrimObs" : {
+    "Value" : "TRUE",
+    "Units" : "",
+    "Description" : "Boolean. If TRUE, TrimDates are used. This variable needed for DA."
+  },
+  "TrimDates" : {
+    "Value" : ["2020-12-02"],
+    "Units" : "",
+    "Description" : "Dates when canopy intervention takes place. Format to pass: YYYY-MM-DD. Assume max 10 trims."
+  }
+}
